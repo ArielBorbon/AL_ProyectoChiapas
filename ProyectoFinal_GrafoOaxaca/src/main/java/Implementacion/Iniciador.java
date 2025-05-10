@@ -20,6 +20,7 @@ public class Iniciador {
      */
     public static void main(String[] args) {
         Grafo grafo = new Grafo();
+        Menu menu = new Menu(grafo);
 
         // Se agregan los vértices al grafo
         for (int i = 1; i < 21; i++) {
