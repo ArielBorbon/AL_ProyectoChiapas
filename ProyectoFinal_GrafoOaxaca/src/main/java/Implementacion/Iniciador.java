@@ -1,5 +1,8 @@
 package Implementacion;
 
+import GUI.Menu;
+import GUI.MenuPrincipal;
+
 /**
  * Clase principal para inicializar el grafo y desplegar el menú.
  *
@@ -20,7 +23,8 @@ public class Iniciador {
      */
     public static void main(String[] args) {
         Grafo grafo = new Grafo();
-        Menu menu = new Menu(grafo);
+       // Menu menu = new Menu(grafo);
+        MenuPrincipal menu = new MenuPrincipal();
         // Se agregan los vértices al grafo
         for (int i = 1; i < 21; i++) {
             grafo.agregarVertice(i);
