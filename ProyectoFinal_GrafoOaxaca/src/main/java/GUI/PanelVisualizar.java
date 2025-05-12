@@ -1,2 +1,9 @@
-package GUI;public class PanelVisualizar {
+package GUI;
+
+import javax.swing.*;
+
+public class PanelVisualizar extends JPanel {
+
+
+
 }
