@@ -2,172 +2,573 @@ package Implementacion;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.Viewer;
 
-/**
- * Clase que representa un grafo no dirigido, implementado mediante una
- * estructura de mapa de listas de adyacencia. Ofrece métodos para agregar
- * vértices, agregar aristas, obtener adyacencias y calcular el Árbol de
- * Expansión Mínima (MST) utilizando el algoritmo de Kruskal.
- *
- * @author Garcia Acosta Alicia Denise 00000252402
- * @author Luna Esquer Pedro 00000252687
- * @author Preciado Guerrero Mario Alejandro 00000252940
- */
 public class Grafo {
 
     private Map<Integer, List<Arista>> grafo;
+    private Map<Integer, String> nombresCiudades;
+    private Map<Integer, Integer> idToIndex;
+    private org.graphstream.graph.Graph graphVisual;
+    private Viewer viewer;
 
-    /**
-     * Constructor por defecto que inicializa un grafo vacío.
-     */
+    // ----------------------- CONSTRUCTORES -----------------------
     public Grafo() {
         this.grafo = new HashMap<>();
+        this.nombresCiudades = new HashMap<>();
+        this.idToIndex = new HashMap<>();
     }
 
-    /**
-     * Constructor que permite inicializar el grafo con un mapa de adyacencias
-     * dado.
-     *
-     * @param grafo Mapa de vértices con sus listas de adyacencias.
-     */
     public Grafo(Map<Integer, List<Arista>> grafo) {
+        this();
         this.grafo = grafo;
     }
+    // ----------------------- SECCIÓN DE VISUALIZACIÓN -----------------------
 
     /**
-     * Agrega un vértice al grafo si aún no existe.
+     * Genera un mapa con los IDs de nodos y sus nombres correspondientes
      *
-     * @param idCiudad Identificador del vértice (ciudad).
+     * @return Mapa ID -> Nombre de ciudad
      */
-    public void agregarVertice(int idCiudad) {
-        grafo.putIfAbsent(idCiudad, new ArrayList<>());
+    public Map<Integer, String> generarTablaNodos() {
+        return new HashMap<>(nombresCiudades);
     }
 
     /**
-     * Agrega una arista al grafo no dirigido.
+     * Genera lista de aristas con formato legible
      *
-     * @param origen Identificador del vértice de origen.
-     * @param destino Identificador del vértice de destino.
-     * @param distancia Peso de la arista.
+     * @return Lista de cadenas con formato "Origen -> Destino (Distancia)"
      */
-    public void agregarArista(int origen, int destino, double distancia) {
-        grafo.get(origen).add(new Arista(origen, destino, distancia));
-        grafo.get(destino).add(new Arista(destino, origen, distancia)); // Grafo no dirigido
-    }
-
-    /**
-     * Obtiene la lista de aristas adyacentes a un vértice dado.
-     *
-     * @param ciudad Identificador del vértice.
-     * @return Lista de aristas adyacentes.
-     */
-    public List<Arista> obtenerAdyacentes(int ciudad) {
-        return grafo.get(ciudad);
-    }
-
-    /**
-     * Obtiene el conjunto de vértices del grafo.
-     *
-     * @return Conjunto de identificadores de los vértices.
-     */
-    public Set<Integer> obtenerVertices() {
-        return grafo.keySet();
-    }
-
-    /**
-     * Calcula el Árbol de Expansión Mínima (MST) del grafo utilizando el
-     * algoritmo de Kruskal.
-     *
-     * @return Mapa que representa el MST como listas de adyacencia.
-     */
-    public Map<Integer, List<Arista>> arbolEsparcimientoMinimo() {
-        Map<Integer, List<Arista>> mst = new HashMap<>();
-        List<Arista> aristas = new ArrayList<>();
-
-        // Recopila todas las aristas del grafo
-        for (List<Arista> aristasNodo : grafo.values()) {
-            aristas.addAll(aristasNodo);
+    public List<String> generarTablaAristas() {
+        Set<Arista> aristasUnicas = new HashSet<>();
+        for (List<Arista> lista : grafo.values()) {
+            for (Arista a : lista) {
+                if (!aristasUnicas.contains(a) && !aristasUnicas.contains(a.inversa())) {
+                    aristasUnicas.add(a);
+                }
+            }
         }
 
-        // Ordena las aristas por distancia (peso)
-        aristas = aristas.stream()
-                .sorted(Comparator.comparingDouble(Arista::getDistancia))
+        return aristasUnicas.stream()
+                .map(a -> String.format("%d -> %d (%.2f)", a.origen, a.destino, a.distancia))
                 .collect(Collectors.toList());
+    }
 
-        // Inicializa la estructura de conjuntos disjuntos
+    /**
+     * Crea/actualiza un nodo en la representación gráfica de GraphStream
+     *
+     * @param idCiudad ID del nodo a crear o actualizar
+     */
+    private void convertirANodoGraphStream(int idCiudad) {
+        String nodeId = String.valueOf(idCiudad);
+
+        // Crear nodo si no existe
+        if (graphVisual.getNode(nodeId) == null) {
+            org.graphstream.graph.Node node = graphVisual.addNode(nodeId);
+            node.setAttribute("ui.label", obtenerEtiquetaNodo(idCiudad));
+            node.setAttribute("ui.style", "fill-color: #999; size: 20px;");
+        }
+    }
+
+    private String convertirAAristaGraphStream(Arista arista) {
+        // Generar ID único para aristas no dirigidas (ej: "1-2" y "2-1" son la misma)
+        String edgeId = generarIdUnicoArista(arista.origen, arista.destino);
+
+        if (graphVisual.getEdge(edgeId) == null) {
+            Edge edge = graphVisual.addEdge(
+                    edgeId,
+                    String.valueOf(arista.origen),
+                    String.valueOf(arista.destino),
+                    true // Indica que es dirigida (pero manejamos bidireccional)
+            );
+
+            edge.setAttribute("ui.label", String.format("%.2f", arista.distancia));
+            edge.setAttribute("ui.style", "fill-color: #666;");
+        }
+
+        return edgeId;
+    }
+
+    public void resaltarElementos(List<Integer> nodos, List<Arista> aristas, String color) {
+        // Resaltar nodos
+        for (int id : nodos) {
+            org.graphstream.graph.Node node = graphVisual.getNode(String.valueOf(id));
+            if (node != null) {
+                node.setAttribute("ui.style", "fill-color: " + color + "; size: 25px;");
+            }
+        }
+
+        // Resaltar aristas
+        for (Arista a : aristas) {
+            String edgeId = generarIdUnicoArista(a.origen, a.destino);
+            Edge edge = graphVisual.getEdge(edgeId);
+            if (edge != null) {
+                edge.setAttribute("ui.style", "fill-color: " + color + "; size: 3px;");
+            }
+        }
+
+        actualizarVistaGrafica();
+    }
+
+    private String obtenerEtiquetaNodo(int idCiudad) {
+        return nombresCiudades.containsKey(idCiudad)
+                ? nombresCiudades.get(idCiudad) + " (" + idCiudad + ")"
+                : String.valueOf(idCiudad);
+    }
+
+    private String generarIdUnicoArista(int origen, int destino) {
+        // Para grafos no dirigidos: ordenar IDs para evitar duplicados
+        return origen < destino
+                ? origen + "-" + destino
+                : destino + "-" + origen;
+    }
+
+    /**
+     * Inicializa la visualización del grafo con GraphStream
+     */
+    public void inicializarVisualizacion() {
+        System.setProperty("org.graphstream.ui", "swing");
+        graphVisual = new SingleGraph("Grafo");
+        graphVisual.setAttribute("ui.stylesheet",
+                "node { size: 20px; fill-color: #999; text-alignment: above; }"
+                + "edge { text-alignment: along; }");
+
+        // Agregar nodos
+        for (Integer id : grafo.keySet()) {
+            org.graphstream.graph.Node n = graphVisual.addNode(String.valueOf(id));
+            n.setAttribute("ui.label", nombresCiudades.getOrDefault(id, String.valueOf(id)));
+        }
+
+        // Agregar aristas
+        Set<String> aristasAgregadas = new HashSet<>();
+        for (Arista a : obtenerAristasUnicas()) {
+            String edgeId = a.origen + "-" + a.destino;
+            if (!aristasAgregadas.contains(edgeId)) {
+                Edge e = graphVisual.addEdge(edgeId, String.valueOf(a.origen), String.valueOf(a.destino));
+                e.setAttribute("ui.label", String.format("%.2f", a.distancia));
+                aristasAgregadas.add(edgeId);
+            }
+        }
+
+        viewer = graphVisual.display();
+        viewer.disableAutoLayout();
+    }
+
+    /**
+     * Actualiza la vista gráfica después de cambios
+     */
+    public void actualizarVistaGrafica() {
+        if (viewer != null) {
+            viewer.enableAutoLayout();
+            try {
+                Thread.sleep(500); // Permite que se actualice la visualización
+            } catch (InterruptedException e) {
+                /* Manejar excepción */ }
+            viewer.disableAutoLayout();
+        }
+    }
+
+    // ----------------------- SECCIÓN DE RECORRIDOS -----------------------
+    // ----------------------- BFS -----------------------
+    /**
+     * Realiza recorrido BFS y retorna nodos por niveles
+     *
+     * @param semilla ID del nodo inicial
+     * @return Lista de niveles con IDs de nodos
+     */
+    public List<List<Integer>> bfs(int semilla) {
+        validarCiudadExiste(semilla);
+
+        List<List<Integer>> niveles = new ArrayList<>();
+        Queue<Integer> cola = new LinkedList<>();
+        Set<Integer> visitados = new HashSet<>();
+        Map<Integer, Integer> padres = new HashMap<>();
+
+        cola.add(semilla);
+        visitados.add(semilla);
+        padres.put(semilla, null);
+
+        while (!cola.isEmpty()) {
+            int nivelSize = cola.size();
+            List<Integer> nivelActual = new ArrayList<>();
+
+            for (int i = 0; i < nivelSize; i++) {
+                int actual = cola.poll();
+                nivelActual.add(actual);
+
+                for (Arista arista : obtenerAdyacentes(actual)) {
+                    int vecino = arista.destino;
+                    if (!visitados.contains(vecino)) {
+                        visitados.add(vecino);
+                        padres.put(vecino, actual);
+                        cola.add(vecino);
+                    }
+                }
+            }
+            niveles.add(nivelActual);
+        }
+        return niveles;
+    }
+
+    /**
+     * Obtiene la lista de aristas adyacentes a un vértice (Ya implementado)
+     *
+     * @param ciudad Identificador del vértice
+     * @return Lista de aristas conectadas
+     */
+    public List<Arista> obtenerAdyacentes(int ciudad) {
+        validarCiudadExiste(ciudad); // Añadir validación
+        return grafo.getOrDefault(ciudad, Collections.emptyList());
+    }
+
+    /**
+     * Genera el árbol de expansión BFS
+     *
+     * @param semilla ID del nodo inicial
+     * @return Mapa de adyacencias del árbol
+     */
+    public Map<Integer, List<Arista>> generarArbolBFS(int semilla) {
+        List<List<Integer>> niveles = bfs(semilla);
+        Map<Integer, List<Arista>> arbol = new HashMap<>();
+        Map<Integer, Integer> padres = new HashMap<>();
+
+        // Construir mapa de padres
+        for (List<Integer> nivel : niveles) {
+            for (int nodo : nivel) {
+                for (Arista arista : obtenerAdyacentes(nodo)) {
+                    if (padres.get(arista.destino) != null
+                            && padres.get(arista.destino) == nodo) {
+                        arbol.computeIfAbsent(nodo, k -> new ArrayList<>()).add(arista);
+                    }
+                }
+            }
+        }
+        return arbol;
+    }
+
+    // ----------------------- SECCIÓN MST -----------------------
+    /**
+     * Calcula el peso total del MST
+     *
+     * @param mst Mapa de adyacencias del árbol
+     * @return Peso total sumando todas las aristas únicas
+     */
+    public double calcularPesoTotalMST(Map<Integer, List<Arista>> mst) {
+        Set<Arista> aristasUnicas = new HashSet<>();
+        double pesoTotal = 0.0;
+
+        for (List<Arista> aristas : mst.values()) {
+            for (Arista a : aristas) {
+                if (aristasUnicas.add(a) && aristasUnicas.add(a.inversa())) {
+                    pesoTotal += a.distancia;
+                }
+            }
+        }
+        return pesoTotal;
+    }
+
+    /**
+     * Muestra las aristas del MST formateadas
+     *
+     * @param aristas Lista de aristas del MST
+     */
+    public void mostrarAristasKruskal(List<Arista> aristas) {
+        Set<Arista> mostradas = new HashSet<>();
+        System.out.println("\nAristas seleccionadas en MST (Kruskal):");
+        double pesoTotal = 0.0;
+
+        for (Arista a : aristas) {
+            if (!mostradas.contains(a) && !mostradas.contains(a.inversa())) {
+                System.out.printf("%d - %d : %.2f%n",
+                        a.origen, a.destino, a.distancia);
+                mostradas.add(a);
+                pesoTotal += a.distancia; // Calcular peso aquí
+            }
+        }
+
+        System.out.printf("Peso total del MST: %.2f%n", pesoTotal);
+    }
+
+    /**
+     * Muestra niveles de BFS en consola
+     *
+     * @param niveles Resultado del método bfs()
+     */
+    public void mostrarSecuenciaNivelesBFS(List<List<Integer>> niveles) {
+        System.out.println("Recorrido BFS por niveles:");
+        for (int i = 0; i < niveles.size(); i++) {
+            System.out.printf("Nivel %d: %s%n", i, niveles.get(i));
+        }
+    }
+
+    // ----------------------- DFS -----------------------
+    /**
+     * Realiza recorrido DFS iterativo
+     *
+     * @param semilla ID del nodo inicial
+     * @return Lista de nodos en orden de descubrimiento
+     */
+    public List<Integer> dfs(int semilla) {
+        validarCiudadExiste(semilla);
+
+        List<Integer> descubiertos = new ArrayList<>();
+        Stack<Integer> pila = new Stack<>();
+        Set<Integer> visitados = new HashSet<>();
+        Map<Integer, Integer> padres = new HashMap<>();
+
+        pila.push(semilla);
+        visitados.add(semilla);
+        padres.put(semilla, null);
+
+        while (!pila.isEmpty()) {
+            int actual = pila.pop();
+            descubiertos.add(actual);
+
+            // Para mantener orden natural, invertir adyacentes
+            List<Arista> adyacentes = new ArrayList<>(obtenerAdyacentes(actual));
+            Collections.reverse(adyacentes);
+
+            for (Arista arista : adyacentes) {
+                int vecino = arista.destino;
+                if (!visitados.contains(vecino)) {
+                    visitados.add(vecino);
+                    padres.put(vecino, actual);
+                    pila.push(vecino);
+                }
+            }
+        }
+        return descubiertos;
+    }
+
+    /**
+     * Genera el árbol de expansión DFS
+     *
+     * @param semilla ID del nodo inicial
+     * @return Mapa de adyacencias del árbol
+     */
+    public Map<Integer, List<Arista>> generarArbolDFS(int semilla) {
+        List<Integer> recorrido = dfs(semilla);
+        Map<Integer, List<Arista>> arbol = new HashMap<>();
+        Map<Integer, Integer> padres = new HashMap<>();
+
+        // Reconstruir relaciones padre-hijo
+        Set<Integer> visitados = new HashSet<>();
+        Stack<Integer> pila = new Stack<>();
+        pila.push(semilla);
+        visitados.add(semilla);
+
+        while (!pila.isEmpty()) {
+            int actual = pila.pop();
+            for (Arista arista : obtenerAdyacentes(actual)) {
+                if (visitados.contains(arista.destino) && padres.get(actual) == arista.destino) {
+                    // Es la arista del árbol
+                    arbol.computeIfAbsent(actual, k -> new ArrayList<>()).add(arista);
+                } else if (!visitados.contains(arista.destino)) {
+                    visitados.add(arista.destino);
+                    padres.put(arista.destino, actual);
+                    pila.push(arista.destino);
+                    arbol.computeIfAbsent(actual, k -> new ArrayList<>()).add(arista);
+                }
+            }
+        }
+        return arbol;
+    }
+
+    // ----------------------- MÉTODOS BÁSICOS MEJORADOS -----------------------
+    private void validarCiudadExiste(int idCiudad) {
+        if (!grafo.containsKey(idCiudad)) {
+            throw new IllegalArgumentException("La ciudad " + idCiudad + " no existe");
+        }
+    }
+
+    public void agregarVertice(int idCiudad) {
+        this.agregarVertice(idCiudad, "");
+    }
+
+    public void agregarVertice(int idCiudad, String nombre) {
+        grafo.putIfAbsent(idCiudad, new ArrayList<>());
+        nombresCiudades.put(idCiudad, nombre);
+        generarMapeoIndices();
+    }
+
+    public void agregarArista(int origen, int destino, double distancia) {
+        validarCiudadExiste(origen);
+        validarCiudadExiste(destino);
+
+        grafo.get(origen).add(new Arista(origen, destino, distancia));
+        grafo.get(destino).add(new Arista(destino, origen, distancia));
+    }
+
+    // ----------------------- KRUSKAL CORREGIDO -----------------------
+    public Map<Integer, List<Arista>> arbolEsparcimientoMinimo() {
+        if (grafo.isEmpty()) {
+            throw new IllegalStateException("Grafo vacío");
+        }
+        generarMapeoIndices();
+        List<Arista> aristas = obtenerAristasUnicas();
         MakeSet conjuntos = new MakeSet(grafo.size());
+        Map<Integer, List<Arista>> mst = new HashMap<>();
 
-        int numArista = 0;
+        aristas.sort(Comparator.comparingDouble(Arista::getDistancia));
+
+        int aristasAgregadas = 0;
         for (Arista arista : aristas) {
-            // Agrega la arista al MST si no forma un ciclo
-            if (conjuntos.union(arista.origen - 1, arista.destino - 1)) {
-                mst.putIfAbsent(arista.origen, new ArrayList<>());
-                mst.putIfAbsent(arista.destino, new ArrayList<>());
+            int idxOrigen = idToIndex.get(arista.origen);
+            int idxDestino = idToIndex.get(arista.destino);
 
-                mst.get(arista.origen).add(arista);
-                mst.get(arista.destino).add(new Arista(arista.destino, arista.origen, arista.distancia));
-                numArista++;
+            if (conjuntos.union(idxOrigen, idxDestino)) {
+                agregarAristaAlMST(mst, arista);
+                if (++aristasAgregadas == grafo.size() - 1) {
+                    break;
+                }
             }
-            // Finaliza cuando se han agregado suficientes aristas
-            if (numArista == grafo.size() - 1) {
-                break;
-            }
+        }
+        if (aristasAgregadas != grafo.size() - 1) {
+            throw new RuntimeException("El grafo no es conexo");
         }
         return mst;
     }
 
-    /**
-     * Clase auxiliar que implementa la estructura de conjuntos disjuntos con
-     * compresión de caminos y unión por rango.
-     */
+    private void agregarAristaAlMST(Map<Integer, List<Arista>> mst, Arista arista) {
+        mst.computeIfAbsent(arista.origen, k -> new ArrayList<>()).add(arista);
+        mst.computeIfAbsent(arista.destino, k -> new ArrayList<>())
+                .add(new Arista(arista.destino, arista.origen, arista.distancia));
+    }
+    
+    
+    
+    
+    
+    // ----------------------- BORUVKA -----------------------
+private List<List<Arista>> fasesBoruvka; // Nuevo miembro de clase
+
+public Map<Integer, List<Arista>> boruvkaMST() {
+    validarGrafoNoVacio();
+    generarMapeoIndices();
+    
+    MakeSet conjuntos = new MakeSet(grafo.size());
+    Map<Integer, List<Arista>> mst = new HashMap<>();
+    fasesBoruvka = new ArrayList<>();
+    int numComponentes = grafo.size();
+
+    while (numComponentes > 1) {
+        Map<Integer, Arista> minAristas = new HashMap<>(); // <Componente, MejorArista>
+        List<Arista> faseActual = new ArrayList<>();
+
+        // Fase 1: Encontrar la mejor arista para cada componente
+        for (Arista arista : obtenerAristasUnicas()) {
+            int u = idToIndex.get(arista.origen);
+            int v = idToIndex.get(arista.destino);
+            
+            int raizU = conjuntos.find(u);
+            int raizV = conjuntos.find(v);
+            
+            if (raizU != raizV) {
+                // Actualizar mejor arista para ambos componentes
+                if (!minAristas.containsKey(raizU) || arista.distancia < minAristas.get(raizU).distancia) {
+                    minAristas.put(raizU, arista);
+                }
+                if (!minAristas.containsKey(raizV) || arista.distancia < minAristas.get(raizV).distancia) {
+                    minAristas.put(raizV, arista);
+                }
+            }
+        }
+
+        // Fase 2: Unir componentes y construir MST
+        Set<Arista> aristasAgregadas = new HashSet<>();
+        for (Arista arista : minAristas.values()) {
+            if (aristasAgregadas.contains(arista) || aristasAgregadas.contains(arista.inversa())) {
+                continue;
+            }
+            
+            int u = idToIndex.get(arista.origen);
+            int v = idToIndex.get(arista.destino);
+            
+            if (conjuntos.union(u, v)) {
+                agregarAristaAlMST(mst, arista);
+                faseActual.add(arista);
+                aristasAgregadas.add(arista);
+                numComponentes--;
+            }
+        }
+
+        if (faseActual.isEmpty()) {
+            throw new RuntimeException("Grafo no conexo");
+        }
+
+        fasesBoruvka.add(faseActual);
+    }
+
+    return mst;
+}
+
+public List<List<Arista>> obtenerFasesBoruvka() {
+    if (fasesBoruvka == null) {
+        throw new IllegalStateException("Ejecutar boruvkaMST() primero");
+    }
+    return new ArrayList<>(fasesBoruvka);
+}
+
+// ----------------------- MÉTODOS AUXILIARES -----------------------
+private void validarGrafoNoVacio() {
+    if (grafo.isEmpty()) {
+        throw new IllegalStateException("El grafo está vacío");
+    }
+}
+
+    // ----------------------- DIJKSTRA MEJORADO -----------------------
+    public ResultadoDijkstra caminoMasCorto(int origen, int destino) {
+        validarCiudadExiste(origen);
+        validarCiudadExiste(destino);
+
+        Map<Integer, Double> distancias = new HashMap<>();
+        Map<Integer, Integer> previos = new HashMap<>();
+        PriorityQueue<DistanciaNodo> cola = new PriorityQueue<>(Comparator.comparingDouble(DistanciaNodo::getDistancia));
+
+        inicializarEstructurasDijkstra(distancias, previos, origen);
+        cola.add(new DistanciaNodo(origen, 0.0));
+
+        while (!cola.isEmpty()) {
+            DistanciaNodo actual = cola.poll();
+            if (actual.nodo == destino) {
+                break;
+            }
+
+            for (Arista arista : grafo.get(actual.nodo)) {
+                actualizarDistancias(actual, arista, distancias, previos, cola);
+            }
+        }
+        if (distancias.get(destino) == Double.POSITIVE_INFINITY) {
+            return new ResultadoDijkstra(Collections.emptyList(), Double.POSITIVE_INFINITY);
+        }
+
+        return new ResultadoDijkstra(reconstruirCamino(previos, destino), distancias.get(destino));
+    }
+
+    // ----------------------- CLASES AUXILIARES ACTUALIZADAS -----------------------
     public static class MakeSet {
 
         private int[] padre;
         private int[] rango;
 
-        /**
-         * Constructor que inicializa los conjuntos disjuntos.
-         *
-         * @param n Número de elementos.
-         */
         public MakeSet(int n) {
             padre = new int[n];
             rango = new int[n];
-            for (int i = 0; i < n; i++) {
-                padre[i] = i; // Inicialmente cada nodo es su propio conjunto
-            }
+            Arrays.setAll(padre, i -> i);
         }
 
-        /**
-         * Encuentra el representante del conjunto al que pertenece un elemento.
-         *
-         * @param x Elemento cuyo conjunto se quiere encontrar.
-         * @return Representante del conjunto.
-         */
         public int find(int x) {
-            if (padre[x] != x) {
-                padre[x] = find(padre[x]); // Compresión de caminos
-            }
-            return padre[x];
+            return padre[x] = (padre[x] == x) ? x : find(padre[x]);
         }
 
-        /**
-         * Une dos conjuntos si no están ya unidos.
-         *
-         * @param x Primer elemento.
-         * @param y Segundo elemento.
-         * @return True si los conjuntos fueron unidos, false si ya estaban en
-         * el mismo conjunto.
-         */
         public boolean union(int x, int y) {
-            int raizX = find(x);
-            int raizY = find(y);
-
+            int raizX = find(x), raizY = find(y);
             if (raizX == raizY) {
                 return false;
             }
 
-            // Unión por rango
             if (rango[raizX] < rango[raizY]) {
                 padre[raizX] = raizY;
             } else if (rango[raizX] > rango[raizY]) {
@@ -176,78 +577,205 @@ public class Grafo {
                 padre[raizY] = raizX;
                 rango[raizX]++;
             }
-
             return true;
         }
     }
 
-    /**
-     * Calcula el camino más corto desde un nodo origen a todos los demás nodos
-     * utilizando el algoritmo de Dijkstra.
-     *
-     * @param origen El nodo de origen.
-     * @param destino El nodo de destino.
-     * @return Un nuevo grafo representando los caminos más cortos desde el
-     * origen.
-     */
-    public Map<Integer, List<Arista>> caminoMasCorto(int origen, int destino) {
-        // Inicialización de estructuras
-        Map<Integer, Double> distancias = new HashMap<>(); //Crea un mapa donde se guardarán las distancias desde el origen a los demás nodos.
-        Map<Integer, Integer> previos = new HashMap<>(); //Crea un mapa donde se guardarán registros del nodo y su nodo previo.
-        PriorityQueue<DistanciaNodo> colaDistancias //para manejar las actualizaciones de las distancias entre el nodo origen y los demás
-                = new PriorityQueue<>(Comparator.comparingDouble(DistanciaNodo::getDistancia));
+    public static class Arista {
 
-        for (Integer nodo : grafo.keySet()) { //Le pone infinito a todas las distancias del mapa
-            distancias.put(nodo, Double.POSITIVE_INFINITY);
-            previos.put(nodo, null);
+        public final int origen;
+        public final int destino;
+        public final double distancia;
+
+        public Arista(int origen, int destino, double distancia) {
+            this.origen = origen;
+            this.destino = destino;
+            this.distancia = distancia;
+
         }
 
-        distancias.put(origen, 0.0); //La distancia del nodo de origen será 0
-        colaDistancias.add(new DistanciaNodo(origen, 0.0));
+        public int getOrigen() {
+            return origen;
+        }
 
-        // Procesamiento de Dijkstra
-        while (!colaDistancias.isEmpty()) {
-            DistanciaNodo actual = colaDistancias.poll(); //Descarta la distancia del nodo actual porque ya se visitó 
-            int nodoActual = actual.getNodo(); //Obtiene el nodo actual (id)
-            double distanciaActual = actual.getDistancia(); //Obtiene la distancia del origen al nodo actual
+        public int getDestino() {
+            return destino;
+        }
 
-            for (Arista arista : grafo.get(nodoActual)) { //Por cada arista del nodo actual
-                int vecino = arista.getDestino(); //Define el vecino (destino de la arista)
-                double nuevaDistancia = distanciaActual + arista.getDistancia(); //calcula la distancia entre las dos
-                //Si la nueva distancia (calculada) es mayor a la distancia que ya tenía
-                if (nuevaDistancia < distancias.get(vecino)) { 
-                    distancias.put(vecino, nuevaDistancia); //Actualiza la distancia
-                    previos.put(vecino, nodoActual); //Actualiza la lista de previos poniendole como previo al destino, el nodo actual
-                    colaDistancias.add(new DistanciaNodo(vecino, nuevaDistancia)); //Agrega el vecino para trabajar sobre el.
-                }
+        public Arista inversa() {
+            return new Arista(destino, origen, distancia);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            Arista otra = (Arista) o;
+            return (origen == otra.origen && destino == otra.destino)
+                    || (origen == otra.destino && destino == otra.origen);
+        }
+
+        @Override
+        public int hashCode() {
+            // Antes: return origen + destino;
+            return Objects.hash(Math.min(origen, destino), Math.max(origen, destino));
+        }
+
+        public double getDistancia() {
+            return this.distancia;
+        }
+    }
+
+    // ----------------------- MÉTODOS AUXILIARES PRIVADOS -----------------------
+    private void generarMapeoIndices() {
+        idToIndex.clear();
+        int index = 0;
+        for (Integer id : grafo.keySet()) {
+            idToIndex.put(id, index++);
+        }
+    }
+
+    private List<Arista> obtenerAristasUnicas() {
+        Set<Arista> aristasUnicas = new HashSet<>();
+        grafo.values().forEach(lista -> lista.forEach(arista -> {
+            if (!aristasUnicas.contains(new Arista(arista.destino, arista.origen, arista.distancia))) {
+                aristasUnicas.add(arista);
+            }
+        }));
+        return new ArrayList<>(aristasUnicas);
+    }
+
+    private void inicializarEstructurasDijkstra(Map<Integer, Double> distancias,
+            Map<Integer, Integer> previos,
+            int origen) {
+        grafo.keySet().forEach(nodo -> {
+            distancias.put(nodo, Double.POSITIVE_INFINITY);
+            previos.put(nodo, null);
+        });
+        distancias.put(origen, 0.0);
+    }
+
+    private void actualizarDistancias(DistanciaNodo actual, Arista arista,
+            Map<Integer, Double> distancias,
+            Map<Integer, Integer> previos,
+            PriorityQueue<DistanciaNodo> cola) {
+        double nuevaDist = actual.distancia + arista.distancia;
+        if (nuevaDist < distancias.get(arista.destino)) {
+            distancias.put(arista.destino, nuevaDist);
+            previos.put(arista.destino, actual.nodo);
+            cola.add(new DistanciaNodo(arista.destino, nuevaDist));
+        }
+    }
+
+    private List<Integer> reconstruirCamino(Map<Integer, Integer> previos, int destino) {
+        LinkedList<Integer> camino = new LinkedList<>();
+        Integer actual = destino;
+        while (actual != null) {
+            camino.addFirst(actual);
+            actual = previos.get(actual);
+        }
+        return camino.isEmpty() || camino.getFirst() != previos.get(destino)
+                ? Collections.emptyList() : camino;
+    }
+
+    // ----------------------- CLASES DE RESULTADO -----------------------
+    public static class ResultadoDijkstra {
+
+        public final List<Integer> camino;
+        public final double distanciaTotal;
+
+        public ResultadoDijkstra(List<Integer> camino, double distanciaTotal) {
+            this.camino = Collections.unmodifiableList(camino);
+            this.distanciaTotal = distanciaTotal;
+        }
+    }
+    
+    
+    
+    
+    
+
+    public Map<Integer, List<Arista>> primMST(int semilla) {
+        validarCiudadExiste(semilla);
+
+        Map<Integer, List<Arista>> mst = new HashMap<>();
+        PriorityQueue<Arista> cola = new PriorityQueue<>(Comparator.comparingDouble(Arista::getDistancia));
+        Set<Integer> visitados = new HashSet<>();
+        List<Arista> aristasSeleccionadas = new ArrayList<>(); // Para el progreso
+
+        // Inicialización
+        visitados.add(semilla);
+        agregarAristasVecinas(cola, semilla, visitados);
+
+        while (!cola.isEmpty() && visitados.size() < grafo.size()) {
+            Arista aristaMin = cola.poll();
+
+            // Solo procesar si un extremo no está visitado
+            if (!visitados.contains(aristaMin.destino)) {
+                // Agregar al MST
+                agregarAristaMST(mst, aristaMin);
+                aristasSeleccionadas.add(aristaMin);
+
+                // Marcar como visitado
+                visitados.add(aristaMin.destino);
+
+                // Agregar nuevas aristas a la cola
+                agregarAristasVecinas(cola, aristaMin.destino, visitados);
             }
         }
 
-        // Construcción del grafo de caminos más cortos
-        Map<Integer, List<Arista>> grafoCaminosCortos = new HashMap<>();
-                
-        for (Integer nodo : grafo.keySet()) {
-            grafoCaminosCortos.putIfAbsent(nodo, new ArrayList<>());
-        }
-        
-        Integer previo = previos.get(destino); 
-        Integer nodo = destino;
-        
-        while(previo!= null){ //Agrega al nuevo grafo solo las aristas que conectan el nodo de origen al del destino
-            double distancia = distancias.get(nodo)- distancias.get(previo);
-            grafoCaminosCortos.get(previo).add(new Arista(previo, nodo, distancia));
-            grafoCaminosCortos.get(nodo).add(new Arista(nodo, previo, distancia));
-            nodo = previos.get(nodo);
-            previo = previos.get(previo);
+        // Validar grafo conexo
+        if (visitados.size() != grafo.size()) {
+            throw new RuntimeException("El grafo no es conexo");
         }
 
-        return grafoCaminosCortos;
+        mostrarProgresoPrim(aristasSeleccionadas);
+        return mst;
     }
 
-    private static class DistanciaNodo {
+    // ----------------------- MÉTODOS AUXILIARES PRIM -----------------------
+    private void agregarAristasVecinas(PriorityQueue<Arista> cola, int nodo, Set<Integer> visitados) {
+        for (Arista arista : obtenerAdyacentes(nodo)) {
+            if (!visitados.contains(arista.destino)) {
+                cola.add(arista);
+            }
+        }
+    }
 
-        private int nodo;
-        private double distancia;
+    private void agregarAristaMST(Map<Integer, List<Arista>> mst, Arista arista) {
+        mst.computeIfAbsent(arista.origen, k -> new ArrayList<>()).add(arista);
+        mst.computeIfAbsent(arista.destino, k -> new ArrayList<>())
+                .add(new Arista(arista.destino, arista.origen, arista.distancia));
+    }
+
+    public void mostrarProgresoPrim(List<Arista> aristasSeleccionadas) {
+        System.out.println("\nProgreso del algoritmo Prim:");
+        double pesoAcumulado = 0.0;
+
+        for (int i = 0; i < aristasSeleccionadas.size(); i++) {
+            Arista a = aristasSeleccionadas.get(i);
+            pesoAcumulado += a.distancia;
+
+            System.out.printf("Iteración %d: %d - %d (%.2f) | Peso acumulado: %.2f%n",
+                    i + 1,
+                    a.origen,
+                    a.destino,
+                    a.distancia,
+                    pesoAcumulado
+            );
+        }
+
+        System.out.printf("Peso total final: %.2f%n", pesoAcumulado);
+    }
+
+    public void generarVisualizacion() {
+        /* Integrar con GraphStream */ }
+
+    private static class DistanciaNodo implements Comparable<DistanciaNodo> {
+
+        private final int nodo;
+        private final double distancia;
 
         public DistanciaNodo(int nodo, double distancia) {
             this.nodo = nodo;
@@ -261,58 +789,12 @@ public class Grafo {
         public double getDistancia() {
             return distancia;
         }
-    }
 
-    /**
-     * Clase que representa una arista del grafo, con sus vértices de origen,
-     * destino y peso.
-     */
-    public static class Arista {
-
-        private int origen;
-        private int destino;
-        private double distancia;
-
-        /**
-         * Constructor para inicializar una arista.
-         *
-         * @param origen Identificador del vértice de origen.
-         * @param destino Identificador del vértice de destino.
-         * @param distancia Peso de la arista.
-         */
-        public Arista(int origen, int destino, double distancia) {
-            this.origen = origen;
-            this.destino = destino;
-            this.distancia = distancia;
+        // Orden natural por distancia (para la cola de prioridad)
+        @Override
+        public int compareTo(DistanciaNodo otro) {
+            return Double.compare(this.distancia, otro.distancia);
         }
-
-        /**
-         * Obtiene el vertice de origen de la arista.
-         *
-         * @return vertice de origen de la arista.
-         */
-        public int getOrigen() {
-            return origen;
-        }
-
-        /**
-         * Obtiene el vertice de destino de la arista.
-         *
-         * @return vertice de destino de la arista.
-         */
-        public int getDestino() {
-            return destino;
-        }
-
-        /**
-         * Obtiene la distancia (peso) de la arista.
-         *
-         * @return peso de la arista.
-         */
-        public double getDistancia() {
-            return distancia;
-        }
-
     }
 
 }
