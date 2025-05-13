@@ -13,7 +13,7 @@ public class MenuPrincipal extends JFrame {
     private JPanel panelMenuLateral;
 
     public MenuPrincipal() {
-        this.setTitle("ALGORITMOS DE GRAFOS EN CHIAPAS");
+        this.setTitle("Chiapas representado en un grafo");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
