@@ -80,5 +80,9 @@ public class MenuPrincipal extends JFrame {
         btnSalir.addActionListener(e -> System.exit(0));
     }
 
+    public JPanel getPanelMenuLateral() {
+        return panelMenuLateral;
+    }
+
    
 }

@@ -11,7 +11,6 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
-import Algoritmos.MST.Kruskal;
 import Implementacion.GrafoTDA;
 
 /**
@@ -109,7 +108,7 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dijkstra = null; // Se elimina el camino mas corto generado
-                mst = new GrafoTDA(Kruskal.arbolEsparcimientoMinimo(grafo));
+                mst = new GrafoTDA(grafo.arbolEsparcimientoMinimo());
                 actualizarPanelGrafo(panelBotones);
             }
         });
@@ -142,7 +141,7 @@ public class Menu extends JFrame {
                         JOptionPane.showMessageDialog(null, "No se encontró a la ciudad de destino",
                             "No Encontrado", JOptionPane.ERROR_MESSAGE);
                     } else{
-                        dijkstra = new Grafo(grafo.caminoMasCorto(idOrigen, idDestino));
+                        dijkstra = new GrafoTDA(grafo.caminoMasCorto(idOrigen, idDestino));
                         actualizarPanelGrafo(panelBotones);
                     }
                     
@@ -192,14 +191,14 @@ public class Menu extends JFrame {
         // Agregar aristas al grafo visual
         for (Integer idCiudad : grafo.obtenerVertices()) {
             String ciudad = idCiudad.toString();
-            for (Grafo.Arista arista : grafo.obtenerAdyacentes(idCiudad)) {
+            for (GrafoTDA.Arista arista : grafo.obtenerAdyacentes(idCiudad)) {
                 Integer idDestino = arista.getDestino();
                 String destino = idDestino.toString();
                 if (graph.getEdge(ciudad + "-" + destino) == null && graph.getEdge(destino + "-" + ciudad) == null) {
                     Edge edge = graph.addEdge(ciudad + "-" + destino, ciudad, destino);
                     edge.setAttribute("ui.label", arista.getDistancia());
                     if (mst != null) {
-                        for (Grafo.Arista aristaMst : mst.obtenerAdyacentes(idCiudad)) {
+                        for (GrafoTDA.Arista aristaMst : mst.obtenerAdyacentes(idCiudad)) {
                             if (arista.equals(aristaMst)) {
                                 edge.setAttribute("ui.class", "mst");
                                 break;
@@ -207,7 +206,7 @@ public class Menu extends JFrame {
                         }
                     }
                     if (dijkstra != null) {
-                        for (Grafo.Arista aristaDijkstra : dijkstra.obtenerAdyacentes(idCiudad)) {
+                        for (GrafoTDA.Arista aristaDijkstra : dijkstra.obtenerAdyacentes(idCiudad)) {
                             double distanciaAristaOG = Math.round(arista.getDistancia() * 100.0) / 100.0;
                             double distanciaAristaDijkstra = Math.round(aristaDijkstra.getDistancia() * 100.0) / 100.0;
 
