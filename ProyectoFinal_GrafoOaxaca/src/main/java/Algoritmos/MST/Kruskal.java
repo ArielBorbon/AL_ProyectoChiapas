@@ -9,10 +9,14 @@ import java.util.stream.Collectors;
 
 import Implementacion.Arista;
 import Implementacion.GrafoTDA;
+import Implementacion.Vertice;
 
 public class Kruskal {
 
-    private static List<List<Integer>> conjuntos;
+    private static List<List<Vertice>> conjuntos;
+
+    public static Map<Vertice, List<Arista>> mst = new HashMap<>();
+
 
     /**
      * Calcula el Árbol de Expansión Mínima (MST) del grafo utilizando el
@@ -20,11 +24,10 @@ public class Kruskal {
      *
      * @return Mapa que representa el MST como listas de adyacencia.
      */
-    public static Map<Integer, List<Arista>> arbolEsparcimientoMinimo(GrafoTDA grafo) {
-        Map<Integer, List<Arista>> mst = new HashMap<>();
+    public static Map<Vertice, List<Arista>> arbolEsparcimientoMinimo(GrafoTDA grafo) {
         List<Arista> aristas = new ArrayList<>();
 
-        for (Integer vertice : grafo.obtenerVertices()) {
+        for (Vertice vertice : grafo.obtenerVertices()) {
             makeSet(vertice);
             aristas.addAll(grafo.obtenerAdyacentes(vertice));
         }
@@ -42,21 +45,22 @@ public class Kruskal {
 
                 mst.get(arista.getOrigen()).add(arista);
                 mst.get(arista.getDestino())
-                        .add(new Arista(arista.getDestino(), arista.getOrigen(), arista.getDestino()));
-                union(arista.getOrigen(), arista.getDestino());
+                        .add(new Arista(arista.getDestino(), arista.getOrigen(), arista.getDistancia()));
+                union(arista.getOrigen(),
+                 arista.getDestino());
             }
         }
         return mst;
     }
 
-    private static void makeSet(Integer vertice) {
-        List<Integer> nuevoConjunto = new ArrayList<>();
+    private static void makeSet(Vertice vertice) {
+        List<Vertice> nuevoConjunto = new ArrayList<>();
         nuevoConjunto.add(vertice);
         conjuntos.add(nuevoConjunto);
     }
 
-    private static List<Integer> findSet(Integer vertice) {
-        for (List<Integer> conjunto : conjuntos) {
+    private static List<Vertice> findSet(Vertice vertice) {
+        for (List<Vertice> conjunto : conjuntos) {
             if (conjunto.contains(vertice)) {
                 return conjunto;
             }
@@ -64,9 +68,9 @@ public class Kruskal {
         return null;
     }
 
-    private static void union(Integer u, Integer v) {
-        List<Integer> conjuntoU = findSet(u);
-        List<Integer> conjuntoV = findSet(v);
+    private static void union(Vertice u, Vertice v) {
+        List<Vertice> conjuntoU = findSet(u);
+        List<Vertice> conjuntoV = findSet(v);
 
         if (conjuntoU != null && conjuntoV != null && conjuntoU != conjuntoV) {
             conjuntoU.addAll(conjuntoV);

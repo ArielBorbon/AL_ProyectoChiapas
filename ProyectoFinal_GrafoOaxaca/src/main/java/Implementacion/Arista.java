@@ -6,18 +6,18 @@ package Implementacion;
  */
 public class Arista {
 
-    private int origen;
-    private int destino;
+    private Vertice origen;
+    private Vertice destino;
     private double distancia;
 
     /**
      * Constructor para inicializar una arista.
      *
-     * @param origen    Identificador del vértice de origen.
-     * @param destino   Identificador del vértice de destino.
+     * @param origen    vértice de origen.
+     * @param destino   vértice de destino.
      * @param distancia Peso de la arista.
      */
-    public Arista(int origen, int destino, double distancia) {
+    public Arista(Vertice origen, Vertice destino, double distancia) {
         this.origen = origen;
         this.destino = destino;
         this.distancia = distancia;
@@ -28,7 +28,7 @@ public class Arista {
      *
      * @return vertice de origen de la arista.
      */
-    public int getOrigen() {
+    public Vertice getOrigen() {
         return origen;
     }
 
@@ -37,7 +37,7 @@ public class Arista {
      *
      * @return vertice de destino de la arista.
      */
-    public int getDestino() {
+    public Vertice getDestino() {
         return destino;
     }
 
