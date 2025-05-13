@@ -10,14 +10,14 @@ public class Estilos {
     public static JButton crearBoton(String nombre) {
         JButton boton = new JButton(nombre);
         boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        boton.setBackground(new Color(230, 230, 250));
+        boton.setBackground(new Color(134, 192, 160));
         boton.setForeground(Color.BLACK);
         boton.setFocusPainted(false);
         boton.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         boton.setPreferredSize(new Dimension(250, 80));
 
-        Color colorBase = new Color(230, 230, 250);
-        Color colorHover = new Color(180, 180, 255);
+        Color colorBase = new Color(134, 192, 160);
+        Color colorHover = new Color(107, 163, 133);
 
         boton.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent evt) {

@@ -17,6 +17,7 @@ public class MenuPrincipal extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
+        this.setBackground(new Color(235, 248, 240));
 
         panelMenuLateral = new JPanel();
         panelMenuLateral.setLayout(new GridBagLayout());
