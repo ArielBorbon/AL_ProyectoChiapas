@@ -22,7 +22,7 @@ public class Iniciador {
      *
      */
     public static void main(String[] args) {
-        Grafo grafo = new Grafo();
+        GrafoTDA grafo = new GrafoTDA();
        // Menu menu = new Menu(grafo);
         MenuPrincipal menu = new MenuPrincipal();
         // Se agregan los vértices al grafo

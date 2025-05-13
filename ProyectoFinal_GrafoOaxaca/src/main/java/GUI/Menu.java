@@ -11,7 +11,8 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
-import Implementacion.Grafo;
+import Algoritmos.MST.Kruskal;
+import Implementacion.GrafoTDA;
 
 /**
  *
@@ -29,9 +30,9 @@ import Implementacion.Grafo;
  */
 public class Menu extends JFrame {
 
-    private final Grafo grafo; // Instancia del grafo principal
-    private Grafo mst; // Grafo del árbol de expansión mínima (MST)
-    private Grafo dijkstra; //Grafo del camino más corto
+    private final GrafoTDA grafo; // Instancia del grafo principal
+    private GrafoTDA mst; // Grafo del árbol de expansión mínima (MST)
+    private GrafoTDA dijkstra; //Grafo del camino más corto
     private final String[] ciudades = { // Lista de nombres de las ciudades representadas como vértices
         "Oaxaca de Juárez", "San Juan Bautista Tuxtepec", "Juchitán de Zaragoza",
         "Santa Cruz Xoxocotlán", "Salina Cruz", "Huajuapan de León",
@@ -55,7 +56,7 @@ public class Menu extends JFrame {
      * @param grafo Grafo principal que se visualizará e interactuará en la
      * interfaz.
      */
-    public Menu(Grafo grafo) {
+    public Menu(GrafoTDA grafo) {
         this.grafo = grafo;
         this.mst = null; // Inicialmente no hay un MST generado
         this.dijkstra = null; //Inicialmente no hay un camino mas corto generado
@@ -108,7 +109,7 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dijkstra = null; // Se elimina el camino mas corto generado
-                mst = new Grafo(grafo.arbolEsparcimientoMinimo());
+                mst = new GrafoTDA(Kruskal.arbolEsparcimientoMinimo(grafo));
                 actualizarPanelGrafo(panelBotones);
             }
         });
