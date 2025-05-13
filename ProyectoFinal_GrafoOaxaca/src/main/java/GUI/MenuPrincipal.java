@@ -49,6 +49,13 @@ public class MenuPrincipal extends JFrame {
         this.setVisible(true);
 
         // Agregar acciones a los botones manualmente sin condicionales
+        btnVisualizar.addActionListener(e -> {
+            this.getContentPane().removeAll();
+            this.add(new PanelVisualizar(), BorderLayout.CENTER);
+            this.revalidate();
+            this.repaint();
+        });
+
         btnRecorrer.addActionListener(e -> {
             this.getContentPane().removeAll();
             this.add(new PanelRecorrer(), BorderLayout.CENTER);
