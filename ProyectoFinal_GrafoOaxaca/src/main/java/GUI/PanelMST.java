@@ -16,6 +16,7 @@ public class PanelMST extends JPanel {
         JButton btnVolver = Estilos.crearBoton("Vovler");
         // panel de botones
         JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(1, 4, 10, 10));
         //agregar botones al panel
         panelBotones.add(btnKruskal, BorderLayout.CENTER);
         panelBotones.add(btnPrim, BorderLayout.CENTER);

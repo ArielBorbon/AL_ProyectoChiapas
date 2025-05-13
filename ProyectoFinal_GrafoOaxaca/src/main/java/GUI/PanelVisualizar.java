@@ -1,7 +1,6 @@
 package GUI;
 
 import java.awt.*;
-import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import GUI.Estilos;
 import javax.swing.*;
@@ -21,6 +20,8 @@ public class PanelVisualizar extends JPanel {
         JButton btnVolver = Estilos.crearBoton("Volver");
         //creacion del panel de los botones
         JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(1, 3, 10, 10));
+
         //agregar botones al panel
         panelBotones.add(btnTabla, BorderLayout.CENTER);
         panelBotones.add(btnGrafo, BorderLayout.CENTER);

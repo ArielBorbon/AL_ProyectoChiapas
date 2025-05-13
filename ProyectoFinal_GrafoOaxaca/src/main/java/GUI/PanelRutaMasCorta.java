@@ -15,6 +15,8 @@ public class PanelRutaMasCorta extends JPanel {
         JButton btnVolver = Estilos.crearBoton("Volver");
         //panel botones
         JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(1, 3, 10, 10));
+
         panelBotones.add(btnBF, BorderLayout.CENTER);
         panelBotones.add(btnDJK, BorderLayout.CENTER);
         panelBotones.add(btnVolver, BorderLayout.CENTER);

@@ -11,9 +11,10 @@ public class PanelRecorrer extends JPanel {
         //creacion de los botones
         JButton btnBFS = Estilos.crearBoton("Usar busqueda en anchura-BFS");
         JButton btnDFS = Estilos.crearBoton("Usar busqueda en profundidad-DFS");
-        JButton btnVolver = Estilos.crearBoton("Vovler");
+        JButton btnVolver = Estilos.crearBoton("Volver");
         //creacion del panel de los botones
         JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(1, 3, 10, 10));
         panelBotones.add(btnBFS, BorderLayout.CENTER);
         panelBotones.add(btnDFS, BorderLayout.CENTER);
         panelBotones.add(btnVolver, BorderLayout.CENTER);

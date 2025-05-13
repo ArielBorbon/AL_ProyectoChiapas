@@ -10,9 +10,10 @@ public class PanelReportes extends JPanel {
         setLayout(new BorderLayout());
         //Botones
         JButton btnReportes = Estilos.crearBoton("Generar reportes de complejidad temporal/ T(n)");
-        JButton btnVolver = Estilos.crearBoton("Vovler");
+        JButton btnVolver = Estilos.crearBoton("Volver");
         //Panel botones
         JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(1, 2, 10, 10));
         panelBotones.add(btnReportes, BorderLayout.CENTER);
         panelBotones.add(btnVolver, BorderLayout.CENTER);
         add(panelBotones, BorderLayout.SOUTH);

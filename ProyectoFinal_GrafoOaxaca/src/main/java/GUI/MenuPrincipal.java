@@ -1,27 +1,25 @@
 package GUI;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import GUI.Estilos;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
-
-
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class MenuPrincipal extends JFrame {
     private JPanel panelMenuLateral;
 
     public MenuPrincipal() {
-        this.setTitle("Chiapas representado en un grafo");
+        this.setTitle("ALGORITMOS DE GRAFOS EN CHIAPAS");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
-        this.setBackground(new Color(235, 248, 240));
 
         panelMenuLateral = new JPanel();
         panelMenuLateral.setLayout(new GridBagLayout());
-        PanelDefault panelDefault = new PanelDefault();
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
@@ -30,15 +28,15 @@ public class MenuPrincipal extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.weighty = 1.0; // Hace que los botones se expandan verticalmente
 
-        // Crear botones
-        JButton btnVisualizar = Estilos.crearBoton("Visualizar");
-        JButton btnRecorrer = Estilos.crearBoton("Recorrer");
-        JButton btnMST = Estilos.crearBoton("Árbol de expansión mínima");
-        JButton btnRutaMasCorta = Estilos.crearBoton("Ruta más corta");
-        JButton btnReportes = Estilos.crearBoton("Reportes de complejidad temporal");
-        JButton btnSalir = Estilos.crearBoton("Salir");
+        // Crear botones manualmente sin usar un loop
+        JButton btnVisualizar = GUI.Estilos.crearBoton("Visualizar");
+        JButton btnRecorrer = GUI.Estilos.crearBoton("Recorrer");
+        JButton btnMST = GUI.Estilos.crearBoton("Árbol de expansión mínima");
+        JButton btnRutaMasCorta = GUI.Estilos.crearBoton("Ruta más corta");
+        JButton btnReportes = GUI.Estilos.crearBoton("Reportes de complejidad temporal");
+        JButton btnSalir = GUI.Estilos.crearBoton("Salir");
 
-        // Agregar botones
+        // Agregar botones manualmente
         panelMenuLateral.add(btnVisualizar, gbc);
         panelMenuLateral.add(btnRecorrer, gbc);
         panelMenuLateral.add(btnMST, gbc);
@@ -49,15 +47,8 @@ public class MenuPrincipal extends JFrame {
         // Agregar el panel al JFrame
         this.add(panelMenuLateral, BorderLayout.WEST);
         this.setVisible(true);
-        this.add(panelDefault, BorderLayout.CENTER);
 
-        btnVisualizar.addActionListener(e -> {
-            this.getContentPane().removeAll();
-            this.add(new PanelVisualizar(), BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();
-        });
-
+        // Agregar acciones a los botones manualmente sin condicionales
         btnRecorrer.addActionListener(e -> {
             this.getContentPane().removeAll();
             this.add(new PanelRecorrer(), BorderLayout.CENTER);
@@ -89,9 +80,5 @@ public class MenuPrincipal extends JFrame {
         btnSalir.addActionListener(e -> System.exit(0));
     }
 
-    // Dentro de MenuPrincipal
-    public JPanel getPanelMenuLateral() {
-        return panelMenuLateral;
-    }
-
+   
 }
