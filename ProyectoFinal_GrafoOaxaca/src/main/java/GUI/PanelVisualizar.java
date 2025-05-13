@@ -1,9 +1,63 @@
 package GUI;
 
+import java.awt.*;
+import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import GUI.Estilos;
 import javax.swing.*;
+
+//import org.graphstream.ui.graphicGraph.stylesheet.Color;
+import org.w3c.dom.events.MouseEvent;
+
 
 public class PanelVisualizar extends JPanel {
 
+    public PanelVisualizar(){
+        //configuracion del panel
+        setLayout(new BorderLayout());
+        //creacion de los botones
+        JButton btnTabla = Estilos.crearBoton("Mostrar tabla de nosos y aristas");
+        JButton btnGrafo = Estilos.crearBoton("Mostrar grafo de forma visual");
+        JButton btnRegresar = Estilos.crearBoton("Regresar al menu principal");
+        //creacion del panel de los botones
+        JPanel panelBotones = new JPanel();
+        //agregar botones al panel
+        panelBotones.add(btnTabla);
+        panelBotones.add(btnGrafo);
+        panelBotones.add(btnRegresar);
+        //agregar panel de los botones
+        add(panelBotones, BorderLayout.SOUTH);
+
+        btnTabla.addActionListener(e -> {
+
+        });
+        btnGrafo.addActionListener(e -> {
+
+
+        });
+        btnRegresar.addActionListener(e -> {
+            // Obtener el JFrame (ventana) que contiene este panel
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+            if (ventana instanceof MenuPrincipal) {
+                MenuPrincipal menu = (MenuPrincipal) ventana;
+
+                // Limpiar todo lo que hay actualmente en la ventana
+                menu.getContentPane().removeAll();
+
+                // Volver a agregar el panel del menú lateral
+                menu.add(menu.getPanelMenuLateral(), BorderLayout.WEST);
+
+                // Agregar algún panel de inicio o bienvenida, si lo usas
+                menu.add(new PanelDefault(), BorderLayout.CENTER);
+
+                // Actualizar la interfaz gráfica
+                menu.revalidate();
+                menu.repaint();
+            }
+        });
+
+    }
 
 
 }

@@ -34,7 +34,7 @@ public class Iniciador {
         grafo.agregarArista(1, 19, 6.5);
         grafo.agregarArista(1, 15, 9.1);
         grafo.agregarArista(1, 4, 8.2);
-        grafo.agregarArista(1, 7, 4.1);
+        grafo.agregarArista(1, 7, .1);
         grafo.agregarArista(1, 14, 7.3);
         grafo.agregarArista(1, 2, 217);
         grafo.agregarArista(2, 10, 36.6);

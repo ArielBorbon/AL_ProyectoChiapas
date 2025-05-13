@@ -4,6 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import GUI.Estilos;
+
+
+
 
 public class MenuPrincipal extends JFrame {
     private JPanel panelMenuLateral;
@@ -16,6 +20,7 @@ public class MenuPrincipal extends JFrame {
 
         panelMenuLateral = new JPanel();
         panelMenuLateral.setLayout(new GridBagLayout());
+        PanelDefault panelDefault = new PanelDefault();
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
@@ -24,15 +29,15 @@ public class MenuPrincipal extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.weighty = 1.0; // Hace que los botones se expandan verticalmente
 
-        // Crear botones manualmente sin usar un loop
-        JButton btnVisualizar = crearBoton("Visualizar");
-        JButton btnRecorrer = crearBoton("Recorrer");
-        JButton btnMST = crearBoton("Árbol de expansión mínima");
-        JButton btnRutaMasCorta = crearBoton("Ruta más corta");
-        JButton btnReportes = crearBoton("Reportes de complejidad temporal");
-        JButton btnSalir = crearBoton("Salir");
+        // Crear botones
+        JButton btnVisualizar = Estilos.crearBoton("Visualizar");
+        JButton btnRecorrer = Estilos.crearBoton("Recorrer");
+        JButton btnMST = Estilos.crearBoton("Árbol de expansión mínima");
+        JButton btnRutaMasCorta = Estilos.crearBoton("Ruta más corta");
+        JButton btnReportes = Estilos.crearBoton("Reportes de complejidad temporal");
+        JButton btnSalir = Estilos.crearBoton("Salir");
 
-        // Agregar botones manualmente
+        // Agregar botones
         panelMenuLateral.add(btnVisualizar, gbc);
         panelMenuLateral.add(btnRecorrer, gbc);
         panelMenuLateral.add(btnMST, gbc);
@@ -43,8 +48,15 @@ public class MenuPrincipal extends JFrame {
         // Agregar el panel al JFrame
         this.add(panelMenuLateral, BorderLayout.WEST);
         this.setVisible(true);
+        this.add(panelDefault, BorderLayout.CENTER);
 
-        // Agregar acciones a los botones manualmente sin condicionales
+        btnVisualizar.addActionListener(e -> {
+            this.getContentPane().removeAll();
+            this.add(new PanelVisualizar(), BorderLayout.CENTER);
+            this.revalidate();
+            this.repaint();
+        });
+
         btnRecorrer.addActionListener(e -> {
             this.getContentPane().removeAll();
             this.add(new PanelRecorrer(), BorderLayout.CENTER);
@@ -76,28 +88,9 @@ public class MenuPrincipal extends JFrame {
         btnSalir.addActionListener(e -> System.exit(0));
     }
 
-    private JButton crearBoton(String nombre) {
-        JButton boton = new JButton(nombre);
-        boton.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        boton.setBackground(new Color(230, 230, 250));
-        boton.setForeground(Color.BLACK);
-        boton.setFocusPainted(false);
-        boton.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-        boton.setPreferredSize(new Dimension(250, 80)); // Aumenta la altura de cada botón a 80px
-
-        Color colorBase = new Color(230, 230, 250);
-        Color colorHover = new Color(180, 180, 255);
-
-        boton.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) {
-                boton.setBackground(colorHover);
-            }
-
-            public void mouseExited(MouseEvent evt) {
-                boton.setBackground(colorBase);
-            }
-        });
-
-        return boton;
+    // Dentro de MenuPrincipal
+    public JPanel getPanelMenuLateral() {
+        return panelMenuLateral;
     }
+
 }
