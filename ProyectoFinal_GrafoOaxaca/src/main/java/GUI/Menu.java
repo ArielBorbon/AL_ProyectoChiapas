@@ -24,8 +24,9 @@ import Implementacion.GrafoTDA;
  * la visualización del grafo.
  *
  * @author Garcia Acosta Alicia Denise 00000252402
- * @author Luna Esquer Pedro 00000252687
- * @author Preciado Guerrero Mario Alejandro 00000252940
+ * @author
+ * @author
+ * 
  */
 public class Menu extends JFrame {
 

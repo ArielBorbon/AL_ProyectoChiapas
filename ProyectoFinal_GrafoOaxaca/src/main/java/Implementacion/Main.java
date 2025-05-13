@@ -5,9 +5,9 @@ import GUI.MenuPrincipal;
 /**
  * Clase principal para inicializar el grafo y desplegar el menú.
  *
- * @author Garcia Acosta Alicia Denise 00000252402
  * @author Luna Esquer Pedro 00000252687
- * @author Preciado Guerrero Mario Alejandro 00000252940
+ * @author 
+ * @author 
  */
 public class Main {
 
@@ -26,5 +26,4 @@ public class Main {
         MenuPrincipal menu = new MenuPrincipal();
         menu.setLocationRelativeTo(null);
     }
-
 }

@@ -1,0 +1,76 @@
+package GUI;
+
+import javax.swing.JPanel;
+
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
+
+import Implementacion.Arista;
+import Implementacion.Vertice;
+
+public class PanelGrafo {
+
+    private static final GrafoChiapas grafoChiapas = new GrafoChiapas(); // Instancia del grafo principal
+
+    /**
+     * Método para mostrar el grafo en un panel.
+     *
+     * Utiliza la librería GraphStream para crear una representación visual del
+     * grafo. Si se ha generado un MST, las aristas del árbol se resaltan con un
+     * estilo diferente.
+     *
+     * @return Un JPanel que contiene la visualización del grafo.
+     */
+    public static JPanel obtenerPanelGrafo() {
+        System.setProperty("org.graphstream.ui", "swing");
+        Graph graph = new SingleGraph("grafo");
+
+        int[][] coordenadas = grafoChiapas.getCoordenadas(); // Coordenadas de las ciudades
+        // Agregar nodos (vértices) al grafo visual
+        for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
+            Node vertice = graph.addNode(ciudad.getNombre());
+            vertice.setAttribute("ui.label", ciudad.getNombre());
+            int indice = grafoChiapas.getCiudades().indexOf(ciudad);
+            vertice.setAttribute("xy", coordenadas[indice][0], coordenadas[indice][1]);
+        }
+
+        // Agregar aristas al grafo visual
+        for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
+            String nombreCiudad = ciudad.getNombre();
+            for (Arista arista : grafoChiapas.getGrafo().obtenerAdyacentes(ciudad)) {
+                Vertice destino = arista.getDestino();
+                String nombreDestino = destino.getNombre();
+                if (graph.getEdge(nombreCiudad + "-" + nombreDestino) == null && graph.getEdge(destino + "-" + nombreCiudad) == null) {
+                    Edge edge = graph.addEdge(nombreCiudad + "-" + nombreDestino, nombreCiudad, nombreDestino);
+                    edge.setAttribute("ui.label", arista.getDistancia());
+                }
+            }
+        }
+
+        // Aplicar estilos al grafo
+        graph.setAttribute("ui.stylesheet", """
+            node {
+                text-size: 10px;
+                fill-color: yellow;
+                size: 50px;
+                text-alignment: center;
+            }
+            edge {
+                text-size: 12px;
+                fill-color: gray;
+            }
+            """);
+
+        // Crear y devolver el panel de visualizació
+        Viewer viewer = graph.display(false);
+        viewer.disableAutoLayout();
+        View view = viewer.getDefaultView();
+        view.openInAFrame(false);
+        return (JPanel) view;
+    }
+
+}

@@ -38,6 +38,7 @@ public class GrafoChiapas {
     private final GrafoTDA grafo = new GrafoTDA();
 
     public GrafoChiapas() {
+        inicializarCiudades();
         inicializarGrafo();
     }
 
@@ -113,5 +114,16 @@ public class GrafoChiapas {
         Vertice villaflores = ciudades.get(ciudades.indexOf((new Vertice("Villaflores"))));
         grafo.agregarArista(villaflores, new Vertice("Berriozábal"), 90.3);
         grafo.agregarArista(villaflores, tonala, 133);
+    }
+
+    public List<Vertice> getCiudades() {
+        return ciudades;
+    }
+    public int[][] getCoordenadas() {
+        return coordenadas;
+    }
+
+    public GrafoTDA getGrafo() {
+        return grafo;
     }
 }
