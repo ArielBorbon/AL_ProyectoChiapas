@@ -18,13 +18,13 @@ public class PanelVisualizar extends JPanel {
         //creacion de los botones
         JButton btnTabla = Estilos.crearBoton("Mostrar tabla de nosos y aristas");
         JButton btnGrafo = Estilos.crearBoton("Mostrar grafo de forma visual");
-        JButton btnRegresar = Estilos.crearBoton("Regresar al menu principal");
+        JButton btnVolver = Estilos.crearBoton("Volver");
         //creacion del panel de los botones
         JPanel panelBotones = new JPanel();
         //agregar botones al panel
-        panelBotones.add(btnTabla);
-        panelBotones.add(btnGrafo);
-        panelBotones.add(btnRegresar);
+        panelBotones.add(btnTabla, BorderLayout.CENTER);
+        panelBotones.add(btnGrafo, BorderLayout.CENTER);
+        panelBotones.add(btnVolver, BorderLayout.CENTER);
         //agregar panel de los botones
         add(panelBotones, BorderLayout.SOUTH);
 
@@ -35,7 +35,7 @@ public class PanelVisualizar extends JPanel {
 
 
         });
-        btnRegresar.addActionListener(e -> {
+        btnVolver.addActionListener(e -> {
             // Obtener el JFrame (ventana) que contiene este panel
             JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
 
