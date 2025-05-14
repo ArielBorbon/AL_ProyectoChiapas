@@ -1,20 +1,24 @@
 package GUI;
 
 import javax.swing.*;
+
+import Algoritmos.MST.Kruskal;
+import Implementacion.GrafoTDA;
+
 import java.awt.*;
 
 public class PanelMST extends JPanel {
 
-    public PanelMST(){
+    public PanelMST() {
         initComponents();
-        mostrarGrafo();
+        mostrarGrafoOriginal();
 
     }
 
     private void initComponents() {
-        //Configuracion basica del panel
+        // Configuracion basica del panel
         setLayout(new BorderLayout());
-        //botones
+        // botones
         JButton btnKruskal = Estilos.crearBoton("Usar algoritmo de Kruskal");
         JButton btnPrim = Estilos.crearBoton("Usar algoritmo de Prim");
         JButton btnBoruvka = Estilos.crearBoton("Usar algoritmo de Boruvka");
@@ -22,15 +26,15 @@ public class PanelMST extends JPanel {
         // panel de botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new GridLayout(1, 4, 10, 10));
-        //agregar botones al panel
+        // agregar botones al panel
         panelBotones.add(btnKruskal, BorderLayout.CENTER);
         panelBotones.add(btnPrim, BorderLayout.CENTER);
         panelBotones.add(btnBoruvka, BorderLayout.CENTER);
         panelBotones.add(btnVolver, BorderLayout.CENTER);
-        //agregar panel
+        // agregar panel
         add(panelBotones, BorderLayout.SOUTH);
-        
-        //metodo para salir
+
+        // metodo para salir
         btnVolver.addActionListener(e -> {
             // Obtener el JFrame (ventana) que contiene este panel
             JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -52,13 +56,36 @@ public class PanelMST extends JPanel {
                 menu.repaint();
             }
         });
-        
+
+        btnKruskal.addActionListener(e -> {
+            pintarMSTKruskal();
+        });
+
     }
 
-    private void mostrarGrafo() {
+    private void pintarMSTKruskal() {
+        try {
+            Kruskal kruskal = new Kruskal(new GrafoChiapas().getGrafo());
+            kruskal.start();
+            kruskal.join();
+            mostrarGrafoPintado(kruskal.getMst());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mostrarGrafoPintado(GrafoTDA grafoPintado) {
+        JPanel panelGrafo = PanelGrafo.obtenerGrafoPintado(grafoPintado);
+        mostrarGrafo(panelGrafo);
+    }
+
+    private void mostrarGrafoOriginal() {
         JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
-        
-        
+        mostrarGrafo(panelGrafo);
+    }
+
+    private void mostrarGrafo(JPanel panelGrafo) {
+
         Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (panelCentral != null) {
             remove(panelCentral);
@@ -68,7 +95,6 @@ public class PanelMST extends JPanel {
 
         revalidate();
         repaint();
-
     }
 
 }

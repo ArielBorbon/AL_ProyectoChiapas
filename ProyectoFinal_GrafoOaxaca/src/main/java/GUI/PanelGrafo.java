@@ -10,6 +10,7 @@ import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
 import Implementacion.Arista;
+import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
 
 public class PanelGrafo {
@@ -26,54 +27,91 @@ public class PanelGrafo {
      * @return Un JPanel que contiene la visualización del grafo.
      */
     public static JPanel obtenerPanelGrafo() {
-        System.setProperty("org.graphstream.ui", "swing");
-        Graph graph = new SingleGraph("grafo");
+        Graph graph = crearGrafoChiapas();
+        return createPanelGrafo(graph);
+    }
 
-        int[][] coordenadas = grafoChiapas.getCoordenadas(); // Coordenadas de las ciudades
+    public static JPanel obtenerGrafoPintado(GrafoTDA grafoPintado) {
+        System.setProperty("org.graphstream.ui", "swing");
+        Graph grafoChiapasVisual = crearGrafoChiapas();
+        Graph graph = new SingleGraph("Grafo Pintado");
+
         // Agregar nodos (vértices) al grafo visual
-        for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
+        for (Vertice ciudad : grafoPintado.obtenerVertices()) {
             Node vertice = graph.addNode(ciudad.getNombre());
             vertice.setAttribute("ui.label", ciudad.getNombre());
-            int indice = grafoChiapas.getCiudades().indexOf(ciudad);
-            vertice.setAttribute("xy", coordenadas[indice][0], coordenadas[indice][1]);
         }
-        
+
         // Agregar aristas al grafo visual
-        for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
-            for (Arista arista : grafoChiapas.getGrafo().obtenerAdyacentes(ciudad)) {
+        for (Vertice ciudad : grafoPintado.obtenerVertices()) {
+            for (Arista arista : grafoPintado.obtenerAdyacentes(ciudad)) {
                 String origen = arista.getOrigen().getNombre();
                 String destino = arista.getDestino().getNombre();
                 if (graph.getEdge(origen + "-" + destino) == null && graph.getEdge(destino + "-" + origen) == null) {
                     Edge edge = graph.addEdge(origen + "-" + destino, origen, destino);
                     edge.setAttribute("ui.label", arista.getDistancia());
+                    Edge carretera = grafoChiapasVisual.getEdge(origen + "-" + destino);
+                    if (carretera != null) {
+                        carretera.setAttribute("ui.class", "highlighted");
+                    }
+
                 }
             }
         }
 
-        // Aplicar estilos al grafo
-        graph.setAttribute("ui.stylesheet", """
-            node {
-                text-size: 10px;
-                fill-color: yellow;
-                size: 40px;
-                text-alignment: center;
-            }
-            edge {
-                text-size: 12px;
-                fill-color: black;
-            }
-            """);
-
-        return getPanelGrafo(graph);
+        return createPanelGrafo(grafoChiapasVisual);
     }
 
-    public static JPanel getPanelGrafo(Graph grafo){
+    public static JPanel createPanelGrafo(Graph grafo) {
         // Crear y devolver el panel de visualizació
         Viewer viewer = grafo.display(false);
         viewer.disableAutoLayout();
         View view = viewer.getDefaultView();
         view.openInAFrame(false);
         return (JPanel) view;
+    }
+
+    private static Graph crearGrafoChiapas() {
+        System.setProperty("org.graphstream.ui", "swing");
+        Graph grafo = new SingleGraph("Grafo Chiapas");
+        int[][] coordenadas = grafoChiapas.getCoordenadas(); // Coordenadas de las ciudades
+        // Agregar nodos (vértices) al grafo visual
+        for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
+            Node vertice = grafo.addNode(ciudad.getNombre());
+            vertice.setAttribute("ui.label", ciudad.getNombre());
+            int indice = grafoChiapas.getCiudades().indexOf(ciudad);
+            vertice.setAttribute("xy", coordenadas[indice][0], coordenadas[indice][1]);
+        }
+
+        // Agregar aristas al grafo visual
+        for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
+            for (Arista arista : grafoChiapas.getGrafo().obtenerAdyacentes(ciudad)) {
+                String origen = arista.getOrigen().getNombre();
+                String destino = arista.getDestino().getNombre();
+                if (grafo.getEdge(origen + "-" + destino) == null && grafo.getEdge(destino + "-" + origen) == null) {
+                    Edge edge = grafo.addEdge(origen + "-" + destino, origen, destino);
+                    edge.setAttribute("ui.label", arista.getDistancia());
+                }
+            }
+        }
+
+        // Aplicar estilos al grafo
+        grafo.setAttribute("ui.stylesheet", """
+                node {
+                    text-size: 10px;
+                    fill-color: yellow;
+                    size: 40px;
+                    text-alignment: center;
+                }
+                edge {
+                    text-size: 12px;
+                    fill-color: black;
+                }
+                edge.highlighted {
+                    fill-color: green;
+                }
+                """);
+        return grafo;
     }
 
 }
