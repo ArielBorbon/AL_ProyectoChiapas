@@ -69,9 +69,9 @@ public class PanelMST extends JPanel {
                 Kruskal kruskal = new Kruskal(new GrafoChiapas().getGrafo());
                 kruskal.start();
                 while (kruskal.isEjecutando()) {
+                    Thread.sleep(1000); 
                     GrafoTDA mst = kruskal.getMst();
                     SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
-                    Thread.sleep(1000); // O el tiempo que necesites
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
