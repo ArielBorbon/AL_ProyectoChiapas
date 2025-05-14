@@ -1,17 +1,14 @@
 package GUI;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import GUI.Estilos;
 import javax.swing.*;
 
-//import org.graphstream.ui.graphicGraph.stylesheet.Color;
-import org.w3c.dom.events.MouseEvent;
 
 public class PanelVisualizar extends JPanel {
 
     public PanelVisualizar() {
         initComponents();
+        mostrarGrafo();
     }
 
     private void initComponents() {
@@ -65,11 +62,16 @@ public class PanelVisualizar extends JPanel {
     private void mostrarGrafo() {
         JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
         
-        Component panelCentral = ((BorderLayout) menu.getContentPane().getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        
+        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (panelCentral != null) {
-            menu.getContentPane().remove(panelCentral);
+            remove(panelCentral);
         }
-        this.add(panelGrafo, BorderLayout.CENTER);
+
+        add(panelGrafo, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
 
     }
 }

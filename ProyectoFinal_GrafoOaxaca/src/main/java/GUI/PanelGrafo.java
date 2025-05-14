@@ -40,12 +40,11 @@ public class PanelGrafo {
 
         // Agregar aristas al grafo visual
         for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
-            String nombreCiudad = ciudad.getNombre();
             for (Arista arista : grafoChiapas.getGrafo().obtenerAdyacentes(ciudad)) {
-                Vertice destino = arista.getDestino();
-                String nombreDestino = destino.getNombre();
-                if (graph.getEdge(nombreCiudad + "-" + nombreDestino) == null && graph.getEdge(destino + "-" + nombreCiudad) == null) {
-                    Edge edge = graph.addEdge(nombreCiudad + "-" + nombreDestino, nombreCiudad, nombreDestino);
+                String origen = arista.getOrigen().getNombre();
+                String destino = arista.getDestino().getNombre();
+                if (graph.getEdge(origen + "-" + destino) == null && graph.getEdge(destino + "-" + origen) == null) {
+                    Edge edge = graph.addEdge(origen + "-" + destino, origen, destino);
                     edge.setAttribute("ui.label", arista.getDistancia());
                 }
             }
