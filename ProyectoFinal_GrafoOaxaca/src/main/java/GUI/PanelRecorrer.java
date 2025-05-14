@@ -2,10 +2,15 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import GUI.Estilos;
+
 public class PanelRecorrer extends JPanel {
 
     public PanelRecorrer(){
+        initComponents();
+        mostrarGrafo();
+    }
+
+    private void initComponents() {
         //configuracion del panel
         setLayout(new BorderLayout());
         //creacion de los botones
@@ -41,6 +46,22 @@ public class PanelRecorrer extends JPanel {
                 menu.repaint();
             }
         });
+    }
+
+    private void mostrarGrafo() {
+        JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
+        
+        
+        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (panelCentral != null) {
+            remove(panelCentral);
+        }
+
+        add(panelGrafo, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
+
     }
 
 }

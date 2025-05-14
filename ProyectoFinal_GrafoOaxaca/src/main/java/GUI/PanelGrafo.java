@@ -37,7 +37,7 @@ public class PanelGrafo {
             int indice = grafoChiapas.getCiudades().indexOf(ciudad);
             vertice.setAttribute("xy", coordenadas[indice][0], coordenadas[indice][1]);
         }
-
+        
         // Agregar aristas al grafo visual
         for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
             for (Arista arista : grafoChiapas.getGrafo().obtenerAdyacentes(ciudad)) {
@@ -55,17 +55,21 @@ public class PanelGrafo {
             node {
                 text-size: 10px;
                 fill-color: yellow;
-                size: 50px;
+                size: 40px;
                 text-alignment: center;
             }
             edge {
                 text-size: 12px;
-                fill-color: gray;
+                fill-color: black;
             }
             """);
 
+        return getPanelGrafo(graph);
+    }
+
+    public static JPanel getPanelGrafo(Graph grafo){
         // Crear y devolver el panel de visualizació
-        Viewer viewer = graph.display(false);
+        Viewer viewer = grafo.display(false);
         viewer.disableAutoLayout();
         View view = viewer.getDefaultView();
         view.openInAFrame(false);

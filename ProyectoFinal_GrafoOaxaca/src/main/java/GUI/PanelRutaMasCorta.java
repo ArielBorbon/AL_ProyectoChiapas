@@ -2,11 +2,15 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import GUI.Estilos;
 
 public class PanelRutaMasCorta extends JPanel {
 
     public PanelRutaMasCorta(){
+        initComponents();
+        mostrarGrafo();
+    }
+
+    private void initComponents() {
         //configuracion del panel
         setLayout(new BorderLayout());
         //Crear botones
@@ -44,6 +48,20 @@ public class PanelRutaMasCorta extends JPanel {
                 menu.repaint();
             }
         });
+    }
+    private void mostrarGrafo() {
+        JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
+        
+        
+        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (panelCentral != null) {
+            remove(panelCentral);
+        }
+
+        add(panelGrafo, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
 
     }
 

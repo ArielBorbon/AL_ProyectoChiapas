@@ -2,11 +2,16 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import GUI.Estilos;
 
 public class PanelMST extends JPanel {
 
     public PanelMST(){
+        initComponents();
+        mostrarGrafo();
+
+    }
+
+    private void initComponents() {
         //Configuracion basica del panel
         setLayout(new BorderLayout());
         //botones
@@ -47,6 +52,22 @@ public class PanelMST extends JPanel {
                 menu.repaint();
             }
         });
+        
+    }
+
+    private void mostrarGrafo() {
+        JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
+        
+        
+        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (panelCentral != null) {
+            remove(panelCentral);
+        }
+
+        add(panelGrafo, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
 
     }
 

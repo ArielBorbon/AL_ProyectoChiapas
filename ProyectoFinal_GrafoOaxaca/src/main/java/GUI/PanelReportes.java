@@ -2,11 +2,16 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import GUI.Estilos;
 
 public class PanelReportes extends JPanel {
 
     public PanelReportes(){
+        initComponents();
+        mostrarGrafo();
+    }
+
+    private void initComponents() {
+        
         setLayout(new BorderLayout());
         //Botones
         JButton btnReportes = Estilos.crearBoton("Generar reportes de complejidad temporal/ T(n)");
@@ -40,6 +45,22 @@ public class PanelReportes extends JPanel {
                 menu.repaint();
             }
         });
+    }
+
+    private void mostrarGrafo() {
+        JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
+        
+        
+        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (panelCentral != null) {
+            remove(panelCentral);
+        }
+
+        add(panelGrafo, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
+
     }
 
 }
