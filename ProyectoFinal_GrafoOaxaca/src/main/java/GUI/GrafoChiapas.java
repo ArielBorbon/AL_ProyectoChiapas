@@ -11,26 +11,26 @@ public class GrafoChiapas {
     private final List<Vertice> ciudades = new LinkedList<>();
 
     private final int[][] coordenadas = {
-    {120, 180},  // Tuxtla Gutiérrez
-    {30, 285},   // Tapachula de Córdova y Ordóñez
-    {150, 150},  // San Cristóbal de Las Casas
-    {180, 135},  // Comitán de Domínguez
-    {126, 174},  // Heroica Chiapa de Corzo
-    {270, 60},   // Palenque
-    {75, 195},   // Cintalapa de Figueroa
-    {240, 144},  // Ocosingo
-    {90, 180},   // Ocozocoautla de Espinosa
-    {54, 240},   // Tonalá
-    {105, 198},  // Villaflores
-    {99, 186},   // Berriozábal
-    {39, 264},   // Huixtla
-    {30, 90},    // Reforma
-    {36, 228},   // Motozintla de Mendoza
-    {45, 246},   // Arriaga
-    {210, 126},  // Las Margaritas
-    {195, 120},  // Frontera Comalapa
-    {180, 141},  // Las Rosas
-    {174, 147}   // Teopisca
+    {380, 300}, // Tuxtla Gutiérrez
+    {600, 50},   // Tapachula de Córdova y Ordóñez (Ajustada para origen inferior izquierda, Y arriba)
+    {480, 320}, // San Cristóbal de Las Casas
+    {650, 220}, // Comitán de Domínguez (Ajustada para origen inferior izquierda, Y arriba)
+    {420, 280}, // Heroica Chiapa de Corzo (Ajustada para origen inferior izquierda, Y arriba)
+    {750, 450}, // Palenque (Ajustada para origen inferior izquierda, Y arriba)
+    {150, 280}, // Cintalapa de Figueroa (Ajustada para origen inferior izquierda, Y arriba)
+    {700, 320}, // Ocosingo (Ajustada para origen inferior izquierda, Y arriba)
+    {280, 280}, // Ocozocoautla de Espinosa (Ajustada para origen inferior izquierda, Y arriba)
+    {200, 120}, // Tonalá (Ajustada para origen inferior izquierda, Y arriba)
+    {350, 200}, // Villaflores (Ajustada para origen inferior izquierda, Y arriba)
+    {350, 380}, // Berriozábal (Ajustada para origen inferior izquierda, Y arriba)
+    {550, 80},  // Huixtla (Ajustada para origen inferior izquierda, Y arriba)
+    {380, 520}, // Reforma (Ajustada para origen inferior izquierda, Y arriba)
+    {600, 120}, // Motozintla de Mendoza (Ajustada para origen inferior izquierda, Y arriba)
+    {150, 200}, // Arriaga (Ajustada para origen inferior izquierda, Y arriba)
+    {750, 250}, // Las Margaritas (Ajustada para origen inferior izquierda, Y arriba)
+    {700, 150}, // Frontera Comalapa (Ajustada para origen inferior izquierda, Y arriba)
+    {550, 250}, // Las Rosas (Ajustada para origen inferior izquierda, Y arriba)
+    {520, 280}  // Teopisca (Ajustada para origen inferior izquierda, Y arriba)
 };
 
     private final GrafoTDA grafo = new GrafoTDA();
@@ -93,7 +93,6 @@ public class GrafoChiapas {
         grafo.agregarArista(tuxtla, ocozocautla, 34.7);
         grafo.agregarArista(tuxtla, berriozabal, 24.4);
         grafo.agregarArista(tuxtla, villaflores, 90.7);
-        grafo.agregarArista(tuxtla, tapachula, 120);
         grafo.agregarArista(tuxtla, tonala, 150);
         grafo.agregarArista(tuxtla, arriaga, 130);
         grafo.agregarArista(tuxtla, palenque, 385);
@@ -117,6 +116,9 @@ public class GrafoChiapas {
         grafo.agregarArista(comitan, fronteraComalapa, 96.1);
         grafo.agregarArista(comitan, ocosingo, 103);
 
+        // Las Rosas
+        grafo.agregarArista(lasRosas, teopisca, 27.8);
+
         // Heroica Chiapa de Corzo
         grafo.agregarArista(chiapa, sanCristobal, 53.1);
 
@@ -138,9 +140,12 @@ public class GrafoChiapas {
         // Tonalá
         grafo.agregarArista(tonala, arriaga, 27.4);
 
-        // Villaflores
-        grafo.agregarArista(villaflores, berriozabal, 90.3);
-        grafo.agregarArista(villaflores, tonala, 133);
+        // Huixtla
+        grafo.agregarArista(huixtla, motozintla, 58.8);
+        grafo.agregarArista(huixtla, tonala, 183);
+
+        // Frontera Comalapa
+        grafo.agregarArista(fronteraComalapa, motozintla, 50.2);
     }
 
     public List<Vertice> getCiudades() {
