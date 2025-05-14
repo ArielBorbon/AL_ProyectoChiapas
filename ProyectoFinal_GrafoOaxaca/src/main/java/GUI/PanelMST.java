@@ -64,16 +64,19 @@ public class PanelMST extends JPanel {
     }
 
     private void pintarMSTKruskal() {
-        try {
-            Kruskal kruskal = new Kruskal(new GrafoChiapas().getGrafo());
-            kruskal.start();
-            while(kruskal.isEjecutando()){
-                mostrarGrafoPintado(kruskal.getMst());
-                Thread.sleep(100);
+        new Thread(() -> {
+            try {
+                Kruskal kruskal = new Kruskal(new GrafoChiapas().getGrafo());
+                kruskal.start();
+                while (kruskal.isEjecutando()) {
+                    GrafoTDA mst = kruskal.getMst();
+                    SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
+                    Thread.sleep(1000); // O el tiempo que necesites
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     private void mostrarGrafoPintado(GrafoTDA grafoPintado) {
