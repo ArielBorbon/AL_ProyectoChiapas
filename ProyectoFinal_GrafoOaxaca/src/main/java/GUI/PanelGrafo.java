@@ -6,8 +6,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.View;
-import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.swing_viewer.SwingViewer;
+import org.graphstream.ui.swing_viewer.ViewPanel;
 
 import Implementacion.Arista;
 import Implementacion.GrafoTDA;
@@ -32,30 +32,23 @@ public class PanelGrafo {
     }
 
     public static JPanel obtenerGrafoPintado(GrafoTDA grafoPintado) {
-        System.setProperty("org.graphstream.ui", "swing");
         Graph grafoChiapasVisual = crearGrafoChiapas();
-        Graph graph = new SingleGraph("Grafo Pintado");
-
-        // Agregar nodos (vértices) al grafo visual
-        for (Vertice ciudad : grafoPintado.obtenerVertices()) {
-            Node vertice = graph.addNode(ciudad.getNombre());
-            vertice.setAttribute("ui.label", ciudad.getNombre());
-        }
 
         // Agregar aristas al grafo visual
         for (Vertice ciudad : grafoPintado.obtenerVertices()) {
             for (Arista arista : grafoPintado.obtenerAdyacentes(ciudad)) {
                 String origen = arista.getOrigen().getNombre();
                 String destino = arista.getDestino().getNombre();
-                if (graph.getEdge(origen + "-" + destino) == null && graph.getEdge(destino + "-" + origen) == null) {
-                    Edge edge = graph.addEdge(origen + "-" + destino, origen, destino);
-                    edge.setAttribute("ui.label", arista.getDistancia());
-                    Edge carretera = grafoChiapasVisual.getEdge(origen + "-" + destino);
-                    if (carretera != null) {
-                        carretera.setAttribute("ui.class", "highlighted");
+                Edge carretera = grafoChiapasVisual.getEdge(origen + "-" + destino);
+                if (carretera != null) {
+                    carretera.setAttribute("ui.class", "highlighted");
+                } else {
+                    Edge altCarretera = grafoChiapasVisual.getEdge(destino + "-" + origen);
+                    if (altCarretera != null) {
+                        altCarretera.setAttribute("ui.class", "highlighted");
                     }
-
                 }
+
             }
         }
 
@@ -64,11 +57,10 @@ public class PanelGrafo {
 
     public static JPanel createPanelGrafo(Graph grafo) {
         // Crear y devolver el panel de visualizació
-        Viewer viewer = grafo.display(false);
+        SwingViewer viewer = new SwingViewer(grafo, SwingViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.disableAutoLayout();
-        View view = viewer.getDefaultView();
-        view.openInAFrame(false);
-        return (JPanel) view;
+        ViewPanel viewPanel = (ViewPanel) viewer.addDefaultView(false);
+        return viewPanel;
     }
 
     private static Graph crearGrafoChiapas() {

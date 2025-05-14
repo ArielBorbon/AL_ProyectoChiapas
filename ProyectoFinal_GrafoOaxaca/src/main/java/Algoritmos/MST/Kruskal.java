@@ -50,7 +50,7 @@ public class Kruskal extends Thread {
 
                     mst.agregarArista(origen, destino, arista.getDistancia());
                     union(origen, destino);
-                    Thread.sleep(1);
+                    Thread.sleep(100);
                 }
             }
         } catch (InterruptedException e) {
@@ -91,5 +91,6 @@ public class Kruskal extends Thread {
 
     public boolean isEjecutando() {
         return ejecutando;
-    }   
+    }
+
 }
