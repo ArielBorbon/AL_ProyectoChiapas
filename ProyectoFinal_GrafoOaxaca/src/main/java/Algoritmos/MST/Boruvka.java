@@ -68,7 +68,7 @@ public class Boruvka extends Thread {
                 }
 
                 int uniones = 0;
-
+ 
                 // Paso 2: Agregar las mejores aristas al MST
                 for (Arista arista : mejorAristaPorComponente.values()) {
                     Vertice u = arista.getOrigen();

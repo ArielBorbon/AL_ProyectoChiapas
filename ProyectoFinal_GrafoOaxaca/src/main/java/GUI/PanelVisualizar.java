@@ -1,16 +1,32 @@
 package GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+
+import Implementacion.GrafoTDA;
+import Implementacion.Vertice;
 
 
 public class PanelVisualizar extends JPanel {
+
+    private final GrafoChiapas grafoChiapas = new GrafoChiapas();
+
 
     public PanelVisualizar() {
         initComponents();
@@ -36,8 +52,10 @@ public class PanelVisualizar extends JPanel {
         add(panelBotones, BorderLayout.SOUTH);
 
         btnTabla.addActionListener(e -> {
+    // Aquí llamamos al método que crea y muestra la tabla
+    mostrarTabla();
+});
 
-        });
         btnGrafo.addActionListener(e -> {
 
         });
@@ -80,4 +98,73 @@ public class PanelVisualizar extends JPanel {
         repaint();
 
     }
+    private String[][] obtenerDatosTabla() {
+    List<String[]> datos = new ArrayList<>();
+
+    GrafoTDA grafo = grafoChiapas.getGrafo();
+
+    for (Vertice origen : grafo.obtenerVertices()) {
+        for (var arista : grafo.obtenerAdyacentes(origen)) {
+            // Evitar duplicados en grafo no dirigido
+            if (origen.getNombre().compareTo(arista.getDestino().getNombre()) < 0) {
+                String[] fila = {
+                    arista.getOrigen().getNombre(),
+                    arista.getDestino().getNombre(),
+                    String.valueOf(arista.getDistancia())
+                };
+                datos.add(fila);
+            }
+        }
+    }
+
+    return datos.toArray(new String[0][0]);
+}
+private void mostrarTabla() {
+    String[][] datos = obtenerDatosTabla();
+    String[] columnas = {"Origen", "Destino", "Distancia"};
+   
+
+    JTable tabla = new JTable(datos, columnas);
+    JScrollPane scrollPane = new JScrollPane(tabla);
+    tabla.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    tabla.setRowHeight(28);
+     JTableHeader header = tabla.getTableHeader();
+    header.setFont(new Font("SansSerif", Font.BOLD, 16));
+    header.setBackground(new Color(60, 130, 180));
+    header.setForeground(Color.WHITE);
+    tabla.setShowHorizontalLines(false);
+    tabla.setShowVerticalLines(false);
+    tabla.setIntercellSpacing(new Dimension(0, 0));
+    scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+
+        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+        if (isSelected) {
+            c.setBackground(new Color(186, 228, 255)); // celeste claro al seleccionar
+        } else if (row % 2 == 0) {
+            c.setBackground(new Color(245, 245, 245)); // gris claro
+        } else {
+            c.setBackground(Color.WHITE); // blanco
+        }
+
+        return c;
+    }
+});
+
+    // Elimina lo que haya actualmente en el centro (por ejemplo, el grafo visual)
+    Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
+    if (panelCentral != null) {
+        remove(panelCentral);
+    }
+
+    add(scrollPane, BorderLayout.CENTER);
+    revalidate();
+    repaint();
+}
+
+
 }
