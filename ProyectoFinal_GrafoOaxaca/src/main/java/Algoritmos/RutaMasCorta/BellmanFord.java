@@ -50,10 +50,11 @@ public final class BellmanFord {
      * @param origen Vértice de partida.
      * @return Un objeto Resultado conteniendo distancias, previos y tabla de
      * iteraciones.
+     * @throws java.lang.InterruptedException
      * @throws IllegalArgumentException si detecta un ciclo de peso negativo
      * alcanzable.
      */
-    public static Resultado ejecutar(GrafoTDA grafo, Vertice origen) {
+    public static Resultado ejecutar(GrafoTDA grafo, Vertice origen) throws InterruptedException {
         Map<Vertice, Double> dist = new HashMap<>();
         Map<Vertice, Vertice> prev = new HashMap<>();
         for (Vertice v : grafo.obtenerVertices()) {
@@ -73,12 +74,25 @@ public final class BellmanFord {
         int V = grafo.obtenerVertices().size();
         for (int i = 1; i < V; i++) {
             boolean cambiado = false;
+            System.out.println("=== Iteración " + i + " de relaxación ===");
+            Thread.sleep(400);
             for (Arista a : aristas) {
                 Vertice u = a.getOrigen();
                 Vertice v = a.getDestino();
                 double peso = a.getDistancia();
                 double alt = dist.get(u) + peso;
+
+                System.out.println(" Verificando arista "
+                        + u.getNombre() + "→" + v.getNombre()
+                        + " (peso " + peso + ")");
+                Thread.sleep(200);
+
                 if (alt < dist.get(v)) {
+                    System.out.println("  Relax: mejora distancia de "
+                            + v.getNombre() + " de " + dist.get(v)
+                            + " a " + alt);
+                    Thread.sleep(300);
+
                     dist.put(v, alt);
                     prev.put(v, u);
                     cambiado = true;
@@ -86,6 +100,9 @@ public final class BellmanFord {
             }
             iteraciones.add(new HashMap<>(dist));
             if (!cambiado) {
+                System.out.println("No hubo cambios en la iteración " + i
+                        + ", deteniendo anticipadamente.");
+                Thread.sleep(300);
                 break;
             }
         }
@@ -99,6 +116,8 @@ public final class BellmanFord {
                 );
             }
         }
+
+
 
         return new Resultado(dist, prev, iteraciones);
     }
@@ -126,4 +145,26 @@ public final class BellmanFord {
         }
         return camino;
     }
+
+    /**
+     * Devuelve una representación textual del camino más corto desde el origen
+     * hasta el destino, usando el mapa de previos generado por Dijkstra o
+     * Bellman–Ford.
+     */
+    private static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {
+        List<String> nombres = new ArrayList<>();
+        Vertice paso = destino;
+
+        while (paso != null) {
+            nombres.add(0, paso.getNombre()); 
+            paso = previos.get(paso);
+        }
+
+        if (nombres.size() == 1) {
+            return "No hay camino hasta " + destino.getNombre();
+        }
+
+        return String.join(" -> ", nombres);
+    }
+
 }
