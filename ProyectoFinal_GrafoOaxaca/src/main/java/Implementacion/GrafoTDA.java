@@ -1,6 +1,10 @@
 package Implementacion;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Clase que representa un grafo no dirigido, implementado mediante una
@@ -49,13 +53,18 @@ public class GrafoTDA {
      * @param destino Identificador del vértice de destino.
      * @param distancia Peso de la arista.
      */
-    public void agregarArista(Vertice origen, Vertice destino, double distancia) {
-        if (!grafo.containsKey(origen) || !grafo.containsKey(destino)) {
-            throw new IllegalArgumentException("Ambos vértices deben existir en el grafo.");
-        }
-        grafo.get(origen).add(new Arista(origen, destino, distancia));
-        grafo.get(destino).add(new Arista(destino, origen, distancia)); 
+   public void agregarArista(Vertice origen, Vertice destino, double distancia) {
+    Vertice realOrigen = buscarVertice(origen.getNombre());
+    Vertice realDestino = buscarVertice(destino.getNombre());
+
+    if (realOrigen == null || realDestino == null) {
+        throw new IllegalArgumentException("Ambos vértices deben existir en el grafo.");
     }
+
+    grafo.get(realOrigen).add(new Arista(realOrigen, realDestino, distancia));
+    grafo.get(realDestino).add(new Arista(realDestino, realOrigen, distancia));
+}
+
 
     /**
      * Obtiene la lista de aristas adyacentes a un vértice dado.
@@ -66,6 +75,15 @@ public class GrafoTDA {
     public List<Arista> obtenerAdyacentes(Vertice vertice) {
         return grafo.get(vertice);
     }
+    private Vertice buscarVertice(String nombre) {
+    for (Vertice v : grafo.keySet()) {
+        if (v.getNombre().equals(nombre)) {
+            return v;
+        }
+    }
+    return null;
+}
+
 
     /**
      * Obtiene el conjunto de vértices del grafo.
