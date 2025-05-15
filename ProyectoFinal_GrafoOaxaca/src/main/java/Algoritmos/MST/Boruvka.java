@@ -1,9 +1,7 @@
 package Algoritmos.MST;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +23,7 @@ public class Boruvka extends Thread {
         try {
             Set<Vertice> vertices = new HashSet<>(grafo.obtenerVertices());
 
+            // Clonar los vértices para el MST
             Map<String, Vertice> verticesMST = new HashMap<>();
             for (Vertice v : vertices) {
                 Vertice clon = new Vertice(v.getNombre());
@@ -34,20 +33,21 @@ public class Boruvka extends Thread {
 
             UnionFind uf = new UnionFind(vertices);
             int componentes = vertices.size();
-
             int iteracion = 0;
 
             while (componentes > 1 && ejecutando) {
                 iteracion++;
 
-                Map<Vertice, Arista> mejorAristaPorComponente = new HashMap<>();
+                Map<String, Arista> mejorAristaPorComponente = new HashMap<>();
                 Set<String> aristasConsideradas = new HashSet<>();
 
+                // Paso 1: Buscar la mejor arista de cada componente
                 for (Vertice v : vertices) {
-                    Vertice compV = uf.find(v);
+                    String compV = uf.find(v).getNombre();
+
                     for (Arista arista : grafo.obtenerAdyacentes(v)) {
                         Vertice w = arista.getDestino();
-                        Vertice compW = uf.find(w);
+                        String compW = uf.find(w).getNombre();
 
                         if (!compV.equals(compW)) {
                             String clave = generarClave(v, w);
@@ -55,19 +55,22 @@ public class Boruvka extends Thread {
                                 aristasConsideradas.add(clave);
 
                                 Arista actual = mejorAristaPorComponente.get(compV);
-                                if (actual == null || arista.getDistancia() < actual.getDistancia()) {
-                                    mejorAristaPorComponente.put(compV, arista);
-                                }
+                                if (actual == null || 
+    arista.getDistancia() < actual.getDistancia() || 
+    (arista.getDistancia() == actual.getDistancia() &&
+     arista.getDestino().getNombre().compareTo(actual.getDestino().getNombre()) < 0)) {
+    mejorAristaPorComponente.put(compV, arista);
+}
+
                             }
                         }
                     }
                 }
 
-                List<Arista> seleccionadas = new ArrayList<>(mejorAristaPorComponente.values());
+                int uniones = 0;
 
-                int unionesEstaIteracion = 0;
-
-                for (Arista arista : seleccionadas) {
+                // Paso 2: Agregar las mejores aristas al MST
+                for (Arista arista : mejorAristaPorComponente.values()) {
                     Vertice u = arista.getOrigen();
                     Vertice w = arista.getDestino();
 
@@ -79,16 +82,16 @@ public class Boruvka extends Thread {
                             arista.getDistancia()
                         );
                         componentes--;
-                        unionesEstaIteracion++;
+                        uniones++;
                     }
                 }
 
-                // 🔴 Solo se duerme y pinta dos veces: después de la 1.ª y después de la última unión
+                // Solo visualizar después de primera iteración y al final
                 if (iteracion == 1 || componentes == 1) {
                     Thread.sleep(1000);
                 }
 
-                if (unionesEstaIteracion == 0) break;
+                if (uniones == 0) break;
             }
 
         } catch (InterruptedException e) {
