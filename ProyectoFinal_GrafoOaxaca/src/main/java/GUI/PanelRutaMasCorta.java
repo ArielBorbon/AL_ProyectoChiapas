@@ -1,7 +1,21 @@
 package GUI;
 
-import javax.swing.*;
+import Algoritmos.RutaMasCorta.Dijkstra;
+import Implementacion.Arista;
+import Implementacion.GrafoTDA;
+import Implementacion.Vertice;
+import java.util.List;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class PanelRutaMasCorta extends JPanel {
 
@@ -10,7 +24,7 @@ public class PanelRutaMasCorta extends JPanel {
 
     private int opcion;
 
-    public PanelRutaMasCorta(){
+    public PanelRutaMasCorta() {
         initComponents();
         mostrarGrafo();
     }
@@ -55,7 +69,6 @@ public class PanelRutaMasCorta extends JPanel {
         });
 
         btnDJK.addActionListener(e -> {
-            // Obtener el JFrame (ventana) que contiene este panel
             JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
 
             if (ventana instanceof MenuPrincipal) {
@@ -65,16 +78,38 @@ public class PanelRutaMasCorta extends JPanel {
                 modalOpciones.mostrarModal();
                 this.opcion = modalOpciones.getOpcion();
 
-                ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);
-                modalSeleccionarFuente.mostrar();
-                String ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();
-                String ciudadDestino = modalSeleccionarFuente.getCiudadDestino();
+                String ciudadOrigen = "";
+                String ciudadDestino = "";
+                if (this.opcion == OPCION_DOS_CIUDADES) {
+                    boolean seleccionValida = false;
+                    while (!seleccionValida) {
+                        ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);
+                        modalSeleccionarFuente.mostrar();
+                        ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();
+                        ciudadDestino = modalSeleccionarFuente.getCiudadDestino();
+                        if (ciudadDestino.equals(ciudadOrigen)) {
+                            JOptionPane.showMessageDialog(this,
+                                    "Por favor, selecciona 2 localidades distintas.",
+                                    "Misma ubicación",
+                                    JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            seleccionValida = true;
+                        }
+                    }
+                    pintarRutaDijkstra(ciudadOrigen, ciudadDestino);
+                } else if (this.opcion == OPCION_UNA_CIUDAD) {
+                    ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);
+                    modalSeleccionarFuente.mostrar();
+                    ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();
+                    pintarRutaDijkstraTodas(ciudadOrigen);
+                }
             }
         });
     }
+
     private void mostrarGrafo() {
         JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
-        
+
         Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (panelCentral != null) {
             remove(panelCentral);
@@ -84,6 +119,117 @@ public class PanelRutaMasCorta extends JPanel {
         revalidate();
         repaint();
 
+    }
+
+    private void pintarRutaDijkstra(String origenNombre, String destinoNombre) {
+        new Thread(() -> {
+            try {
+                GrafoTDA grafoBase = new GrafoChiapas().getGrafo();
+
+                Vertice origen = grafoBase.obtenerVertices().stream()
+                        .filter(v -> v.getNombre().equals(origenNombre))
+                        .findFirst()
+                        .orElseThrow();
+                Vertice destino = grafoBase.obtenerVertices().stream()
+                        .filter(v -> v.getNombre().equals(destinoNombre))
+                        .findFirst()
+                        .orElseThrow();
+
+                List<Arista> camino = Dijkstra.caminoMasCortoListaAristas(grafoBase, origen, destino);
+
+                GrafoTDA subGrafo = new GrafoTDA();
+
+                for (Vertice v : grafoBase.obtenerVertices()) {
+                    subGrafo.agregarVertice(v);
+                }
+
+                for (Arista ar : camino) {
+                    subGrafo.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
+
+                    SwingUtilities.invokeLater(() -> {
+                        JPanel panel = PanelGrafo.obtenerGrafoPintado(subGrafo);
+                        removeCurrentGrafoPanel();
+                        add(panel, BorderLayout.CENTER);
+                        revalidate();
+                        repaint();
+                    });
+
+                    Thread.sleep(1000);
+                }
+
+                System.out.println("Ruta Dijkstra: "
+                        + camino.stream()
+                                .map(a -> a.getOrigen().getNombre() + "→" + a.getDestino().getNombre())
+                                .collect(Collectors.joining(", ")));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+
+    /**
+     * Quita el panel central actual antes de añadir el nuevo
+     */
+    private void removeCurrentGrafoPanel() {
+        Component actual = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (actual != null) {
+            remove(actual);
+        }
+    }
+
+    private void pintarRutaDijkstraTodas(String origenNombre) {
+        new Thread(() -> {
+            try {
+                GrafoTDA base = new GrafoChiapas().getGrafo();
+                Vertice origen = base.obtenerVertices().stream()
+                        .filter(v -> v.getNombre().equals(origenNombre))
+                        .findFirst().orElseThrow();
+
+                GrafoTDA caminos = Dijkstra.caminoMasCortoTodas(base, origen);
+
+                List<Arista> todas = new ArrayList<>();
+                for (Vertice u : caminos.obtenerVertices()) {
+                    todas.addAll(caminos.obtenerAdyacentes(u));
+                }
+
+                Set<String> vistos = new HashSet<>();
+                for (Arista a : todas) {
+                    String key = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
+                    String rev = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
+                    if (vistos.contains(key) || vistos.contains(rev)) {
+                        continue;
+                    }
+                    vistos.add(key);
+
+                    GrafoTDA parcial = new GrafoTDA();
+                    for (Vertice v : base.obtenerVertices()) {
+                        parcial.agregarVertice(v);
+                    }
+                    for (String agregado : vistos) {
+                        String[] parts = agregado.split("-");
+                        Vertice x = base.obtenerVertices().stream()
+                                .filter(v -> v.getNombre().equals(parts[0])).findFirst().get();
+                        Vertice y = base.obtenerVertices().stream()
+                                .filter(v -> v.getNombre().equals(parts[1])).findFirst().get();
+                        double w = caminos.obtenerAdyacentes(x).stream()
+                                .filter(ar -> ar.getDestino().equals(y))
+                                .findFirst().get().getDistancia();
+                        parcial.agregarArista(x, y, w);
+                    }
+
+                    SwingUtilities.invokeLater(() -> {
+                        removeCurrentGrafoPanel();
+                        add(PanelGrafo.obtenerGrafoPintado(parcial), BorderLayout.CENTER);
+                        revalidate();
+                        repaint();
+                    });
+
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
     }
 
 }
