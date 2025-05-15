@@ -46,20 +46,16 @@ public final class Dijkstra {
             Vertice u = dn.getNodo();
             double du = dn.getDistancia();
 
-            System.out.println("Desencolando vértice: "
-                    + u.getNombre() + " con distancia provisional " + du);
-            Thread.sleep(500);
-
+//            System.out.println("Desencolando vértice: "
+//                    + u.getNombre() + " con distancia provisional " + du);
             for (Arista a : grafo.obtenerAdyacentes(u)) {
                 Vertice v = a.getDestino();
                 double alt = du + a.getDistancia();
                 if (alt < distancias.get(v)) {
 
-                    System.out.println(" Relax: mejora distancia de "
-                            + v.getNombre() + " de " + distancias.get(v)
-                            + " a " + alt);
-                    Thread.sleep(300);
-
+//                    System.out.println(" Relax: mejora distancia de "
+//                            + v.getNombre() + " de " + distancias.get(v)
+//                            + " a " + alt);
                     distancias.put(v, alt);
                     previos.put(v, u);
                     cola.add(new DistanciaNodo(v, alt));
@@ -82,10 +78,42 @@ public final class Dijkstra {
 
         }
 
-        System.out.println("Ruta final de " + origen.getNombre()
-                + " a " + destino.getNombre() + ": " + caminoMasTexto(previos, destino));
-        Thread.sleep(500);
+//        System.out.println("Ruta final de " + origen.getNombre()
+//                + " a " + destino.getNombre() + ": " + caminoMasTexto(previos, destino));
         return subGrafo;
+    }
+
+    public static ResultadoPrevia ejecutarPrevia(GrafoTDA grafo, Vertice origen) {
+        Map<Vertice, Double> dist = new HashMap<>();
+        Map<Vertice, Vertice> prev = new HashMap<>();
+        PriorityQueue<DistanciaNodo> pq
+                = new PriorityQueue<>(Comparator.comparingDouble(DistanciaNodo::getDistancia));
+
+        // Inicialización
+        for (Vertice v : grafo.obtenerVertices()) {
+            dist.put(v, Double.POSITIVE_INFINITY);
+            prev.put(v, null);
+        }
+        dist.put(origen, 0.0);
+        pq.add(new DistanciaNodo(origen, 0.0));
+
+        // Algoritmo
+        while (!pq.isEmpty()) {
+            DistanciaNodo dn = pq.poll();
+            Vertice u = dn.getNodo();
+            double du = dn.getDistancia();
+            for (Arista a : grafo.obtenerAdyacentes(u)) {
+                Vertice v = a.getDestino();
+                double alt = du + a.getDistancia();
+                if (alt < dist.get(v)) {
+                    dist.put(v, alt);
+                    prev.put(v, u);
+                    pq.add(new DistanciaNodo(v, alt));
+                }
+            }
+        }
+
+        return new ResultadoPrevia(dist, prev);
     }
 
     /**
@@ -116,16 +144,14 @@ public final class Dijkstra {
             Vertice u = dn.getNodo();
             double du = dn.getDistancia();
 
-
             for (Arista a : grafo.obtenerAdyacentes(u)) {
                 Vertice v = a.getDestino();
                 double alt = distancias.get(u) + a.getDistancia();
                 if (alt < distancias.get(v)) {
 
-                    System.out.println(" Relax: mejora distancia de "
-                            + v.getNombre() + " de " + distancias.get(v)
-                            + " a " + alt);
-
+//                    System.out.println(" Relax: mejora distancia de "
+//                            + v.getNombre() + " de " + distancias.get(v)
+//                            + " a " + alt);
                     distancias.put(v, alt);
                     previos.put(v, u);
                     cola.add(new DistanciaNodo(v, alt));
@@ -196,11 +222,11 @@ public final class Dijkstra {
                 subGrafo.agregarArista(padre, v, peso);
             }
         }
-        
+
         for (Vertice v : grafo.obtenerVertices()) {
             if (v != origen) {
-                System.out.println("Ruta final de " + origen.getNombre()
-                        + " a " + v.getNombre() + ": " + caminoMasTexto(prev, v));
+//                System.out.println("Ruta final de " + origen.getNombre()
+//                        + " a " + v.getNombre() + ": " + caminoMasTexto(prev, v));
             }
         }
 
@@ -231,7 +257,7 @@ public final class Dijkstra {
      * hasta el destino, usando el mapa de previos generado por Dijkstra o
      * Bellman–Ford.
      */
-    private static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {
+    public static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {
         List<String> nombres = new ArrayList<>();
         Vertice paso = destino;
 
@@ -245,6 +271,61 @@ public final class Dijkstra {
         }
 
         return String.join(" -> ", nombres);
+    }
+
+    /**
+     * Devuelve el mapa de predecesores para cada vértice alcanzable desde el
+     * origen. Sirve para reconstruir los caminos más cortos desde 'origen' a
+     * cualquier otro nodo.
+     *
+     * @param grafo grafo original
+     * @param origen vértice fuente
+     * @return mapa de predecesores (cada vértice apunta a su anterior en el
+     * camino más corto)
+     */
+    public static Map<Vertice, Vertice> caminoMasCortoPrevia(GrafoTDA grafo, Vertice origen) {
+        Map<Vertice, Double> distancias = new HashMap<>();
+        Map<Vertice, Vertice> previos = new HashMap<>();
+        PriorityQueue<DistanciaNodo> cola
+                = new PriorityQueue<>(Comparator.comparingDouble(DistanciaNodo::getDistancia));
+
+        for (Vertice v : grafo.obtenerVertices()) {
+            distancias.put(v, Double.POSITIVE_INFINITY);
+            previos.put(v, null);
+        }
+
+        distancias.put(origen, 0.0);
+        cola.add(new DistanciaNodo(origen, 0.0));
+
+        while (!cola.isEmpty()) {
+            DistanciaNodo dn = cola.poll();
+            Vertice u = dn.getNodo();
+            double du = dn.getDistancia();
+
+            for (Arista a : grafo.obtenerAdyacentes(u)) {
+                Vertice v = a.getDestino();
+                double alt = du + a.getDistancia();
+                if (alt < distancias.get(v)) {
+                    distancias.put(v, alt);
+                    previos.put(v, u);
+                    cola.add(new DistanciaNodo(v, alt));
+                }
+            }
+        }
+
+        return previos;
+    }
+
+
+    public static class ResultadoPrevia {
+
+        public final Map<Vertice, Double> distancias;
+        public final Map<Vertice, Vertice> previos;
+
+        public ResultadoPrevia(Map<Vertice, Double> dist, Map<Vertice, Vertice> prev) {
+            this.distancias = dist;
+            this.previos = prev;
+        }
     }
 
 }

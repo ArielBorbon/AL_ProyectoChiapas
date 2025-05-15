@@ -29,10 +29,13 @@ GUI\ModalSeleccionarFuente$1.class
 GUI\PanelDefault.class
 Algoritmos\Busqueda\DFS$Resultado.class
 Algoritmos\RutaMasCorta\BellmanFord$Resultado.class
+Algoritmos\MST\BoruvkaListener.class
 GUI\Estilos.class
 GUI\PanelesMST\PanelBoruvka.class
 GUI\ModalRutaMasCorta$1.class
 GUI\Estilos$1.class
 Algoritmos\RutaMasCorta\Dijkstra$DistanciaNodo.class
+Algoritmos\RutaMasCorta\Dijkstra$ResultadoPrevia.class
 Algoritmos\RutaMasCorta\Dijkstra.class
+Algoritmos\MST\UnionFind.class
 Implementacion\Arista.class

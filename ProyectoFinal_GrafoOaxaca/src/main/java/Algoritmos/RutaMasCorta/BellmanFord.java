@@ -74,24 +74,22 @@ public final class BellmanFord {
         int V = grafo.obtenerVertices().size();
         for (int i = 1; i < V; i++) {
             boolean cambiado = false;
-            System.out.println("=== Iteración " + i + " de relaxación ===");
-            Thread.sleep(400);
+//            System.out.println("=== Iteración " + i + " de relaxación ===");
+
             for (Arista a : aristas) {
                 Vertice u = a.getOrigen();
                 Vertice v = a.getDestino();
                 double peso = a.getDistancia();
                 double alt = dist.get(u) + peso;
 
-                System.out.println(" Verificando arista "
-                        + u.getNombre() + "→" + v.getNombre()
-                        + " (peso " + peso + ")");
-                Thread.sleep(200);
+//                System.out.println(" Verificando arista "
+//                        + u.getNombre() + "→" + v.getNombre()
+//                        + " (peso " + peso + ")");
 
                 if (alt < dist.get(v)) {
-                    System.out.println("  Relax: mejora distancia de "
-                            + v.getNombre() + " de " + dist.get(v)
-                            + " a " + alt);
-                    Thread.sleep(300);
+//                    System.out.println("  Relax: mejora distancia de "
+//                            + v.getNombre() + " de " + dist.get(v)
+//                            + " a " + alt);
 
                     dist.put(v, alt);
                     prev.put(v, u);
@@ -100,9 +98,8 @@ public final class BellmanFord {
             }
             iteraciones.add(new HashMap<>(dist));
             if (!cambiado) {
-                System.out.println("No hubo cambios en la iteración " + i
-                        + ", deteniendo anticipadamente.");
-                Thread.sleep(300);
+//                System.out.println("No hubo cambios en la iteración " + i
+//                        + ", deteniendo anticipadamente.");
                 break;
             }
         }
@@ -116,8 +113,6 @@ public final class BellmanFord {
                 );
             }
         }
-
-
 
         return new Resultado(dist, prev, iteraciones);
     }
@@ -151,12 +146,12 @@ public final class BellmanFord {
      * hasta el destino, usando el mapa de previos generado por Dijkstra o
      * Bellman–Ford.
      */
-    private static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {
+    public static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {
         List<String> nombres = new ArrayList<>();
         Vertice paso = destino;
 
         while (paso != null) {
-            nombres.add(0, paso.getNombre()); 
+            nombres.add(0, paso.getNombre());
             paso = previos.get(paso);
         }
 
@@ -165,6 +160,28 @@ public final class BellmanFord {
         }
 
         return String.join(" -> ", nombres);
+    }
+
+    public static GrafoTDA caminoMasCortoTodas(GrafoTDA grafo, Vertice origen)
+            throws InterruptedException {
+        // Ejecutamos Bellman–Ford para llenar distancias y previos
+        Resultado res = ejecutar(grafo, origen);
+
+        // Creamos el grafo de salida
+        GrafoTDA subGrafo = new GrafoTDA();
+        // 1) Agregar todos los vértices
+        for (Vertice v : grafo.obtenerVertices()) {
+            subGrafo.agregarVertice(v);
+        }
+        // 2) Para cada vértice (excepto la fuente), añadimos la arista mínimo prev→v
+        for (Vertice v : grafo.obtenerVertices()) {
+            Vertice padre = res.previos.get(v);
+            if (padre != null) {
+                double peso = res.distancias.get(v) - res.distancias.get(padre);
+                subGrafo.agregarArista(padre, v, peso);
+            }
+        }
+        return subGrafo;
     }
 
 }

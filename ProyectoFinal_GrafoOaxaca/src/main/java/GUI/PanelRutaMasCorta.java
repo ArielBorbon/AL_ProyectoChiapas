@@ -1,5 +1,6 @@
 package GUI;
 
+import Algoritmos.RutaMasCorta.BellmanFord;
 import Algoritmos.RutaMasCorta.Dijkstra;
 import Implementacion.Arista;
 import Implementacion.GrafoTDA;
@@ -7,13 +8,15 @@ import Implementacion.Vertice;
 import java.util.List;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -105,7 +108,54 @@ public class PanelRutaMasCorta extends JPanel {
                 }
             }
         });
+
+        // --- Bellman–Ford ---
+        btnBF.addActionListener(e
+                -> {
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (!(ventana instanceof MenuPrincipal)) {
+                return;
+            }
+            MenuPrincipal menu = (MenuPrincipal) ventana;
+
+            // 1) Elegir modalidad
+            ModalRutaMasCorta modalOpc = new ModalRutaMasCorta(menu, true);
+            modalOpc.mostrarModal();
+            this.opcion = modalOpc.getOpcion();
+
+            // 2) Seleccionar origen (y destino si aplica)
+            String ciudadOrigen = "";
+            String ciudadDestino = "";
+            if (opcion == OPCION_DOS_CIUDADES) {
+                boolean ok = false;
+                while (!ok) {
+                    ModalSeleccionarFuente msf = new ModalSeleccionarFuente(menu, true, opcion);
+                    msf.mostrar();
+                    ciudadOrigen = msf.getCiudadOrigen();
+                    ciudadDestino = msf.getCiudadDestino();
+                    if (ciudadOrigen.equals(ciudadDestino)) {
+                        JOptionPane.showMessageDialog(this,
+                                "Selecciona dos localidades distintas",
+                                "Error de selección",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        ok = true;
+                    }
+                }
+                pintarRutaBellmanFord(ciudadOrigen, ciudadDestino);
+            } else {
+                ModalSeleccionarFuente msf = new ModalSeleccionarFuente(menu, true, opcion);
+                msf.mostrar();
+                ciudadOrigen = msf.getCiudadOrigen();
+                pintarRutaBellmanFordTodas(ciudadOrigen);
+            }
+        });
+
     }
+
+    ;
+    
+    
 
     private void mostrarGrafo() {
         JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
@@ -139,11 +189,28 @@ public class PanelRutaMasCorta extends JPanel {
 
                 GrafoTDA subGrafo = new GrafoTDA();
 
-                for (Vertice v : grafoBase.obtenerVertices()) {
+                List<Vertice> ciudades = new ArrayList<>(grafoBase.obtenerVertices());
+                ciudades.sort(Comparator.comparing(Vertice::getNombre));
+                for (Vertice v : ciudades) {
                     subGrafo.agregarVertice(v);
+
                 }
 
+                double acumulado = 0;
+                List<String> rutaConPesos = new ArrayList<>();
+                // Añadimos el origen con peso 0
+                rutaConPesos.add(origenNombre + " (0)");
+
+                List<String> nombresRuta = new ArrayList<>();
                 for (Arista ar : camino) {
+                    acumulado += ar.getDistancia();
+                    rutaConPesos.add(ar.getDestino().getNombre() + " (" + (int) acumulado + ")");
+                    subGrafo.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
+
+                    if (nombresRuta.isEmpty()) {
+                        nombresRuta.add(ar.getOrigen().getNombre());
+                    }
+                    nombresRuta.add(ar.getDestino().getNombre());
                     subGrafo.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
 
                     SwingUtilities.invokeLater(() -> {
@@ -157,10 +224,20 @@ public class PanelRutaMasCorta extends JPanel {
                     Thread.sleep(1000);
                 }
 
-                System.out.println("Ruta Dijkstra: "
-                        + camino.stream()
-                                .map(a -> a.getOrigen().getNombre() + "→" + a.getDestino().getNombre())
-                                .collect(Collectors.joining(", ")));
+                String resumenRuta = String.join(" -> ", rutaConPesos);
+
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            "Ruta final de " + origenNombre + " a " + destinoNombre + ":\n" + resumenRuta,
+                            "Camino más corto (Dijkstra)",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                });
+
+                // System.out.println("Ruta Dijkstra: "
+                //        + camino.stream()
+                //               .map(a -> a.getOrigen().getNombre() + "→" + a.getDestino().getNombre())
+                //              .collect(Collectors.joining(", ")));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -185,11 +262,22 @@ public class PanelRutaMasCorta extends JPanel {
                         .filter(v -> v.getNombre().equals(origenNombre))
                         .findFirst().orElseThrow();
 
+                Dijkstra.ResultadoPrevia resultadoPrevia = Dijkstra.ejecutarPrevia(base, origen);
                 GrafoTDA caminos = Dijkstra.caminoMasCortoTodas(base, origen);
 
                 List<Arista> todas = new ArrayList<>();
-                for (Vertice u : caminos.obtenerVertices()) {
+
+                // crea una lista ordenada por nombre
+                List<Vertice> ordenados = new ArrayList<>(caminos.obtenerVertices());
+                ordenados.sort(Comparator.comparing(Vertice::getNombre));
+
+                // itera en orden lexicográfico
+                for (Vertice u : ordenados) {
                     todas.addAll(caminos.obtenerAdyacentes(u));
+                    List<Arista> ady = new ArrayList<>(caminos.obtenerAdyacentes(u));
+                    ady.sort(Comparator
+                            .comparing((Arista a) -> a.getDestino().getNombre())
+                    );
                 }
 
                 Set<String> vistos = new HashSet<>();
@@ -202,9 +290,12 @@ public class PanelRutaMasCorta extends JPanel {
                     vistos.add(key);
 
                     GrafoTDA parcial = new GrafoTDA();
-                    for (Vertice v : base.obtenerVertices()) {
+                    List<Vertice> ciudades = new ArrayList<>(base.obtenerVertices());
+                    ciudades.sort(Comparator.comparing(Vertice::getNombre));
+                    for (Vertice v : ciudades) {
                         parcial.agregarVertice(v);
                     }
+
                     for (String agregado : vistos) {
                         String[] parts = agregado.split("-");
                         Vertice x = base.obtenerVertices().stream()
@@ -226,10 +317,193 @@ public class PanelRutaMasCorta extends JPanel {
 
                     Thread.sleep(1000);
                 }
+
+                StringBuilder sb = new StringBuilder("Rutas más cortas desde " + origenNombre + ":\n");
+                ordenados = new ArrayList<>(base.obtenerVertices());
+                ordenados.sort(Comparator.comparing(Vertice::getNombre));
+
+                for (Vertice destino : ordenados) {
+                    if (destino.equals(origen)) {
+                        continue;
+                    }
+
+                    // Reconstruimos la lista de vértices del camino
+                    List<Vertice> caminoV = new ArrayList<>();
+                    Vertice paso = destino;
+                    while (paso != null) {
+                        caminoV.add(0, paso);
+                        paso = resultadoPrevia.previos.get(paso);
+                    }
+
+                    // Ahora formateamos cada vértice con su distancia acumulada
+                    List<String> partes = new ArrayList<>();
+                    for (Vertice v : caminoV) {
+                        double pesoAcum = resultadoPrevia.distancias.get(v);
+                        partes.add(v.getNombre() + " (" + (int) Math.round(pesoAcum) + ")");
+                    }
+                    sb.append("- ")
+                            .append(String.join(" → ", partes))
+                            .append("\n");
+                }
+
+                // 5) Mostramos el cuadro final con pesos
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            sb.toString(),
+                            "Caminos más cortos desde " + origenNombre,
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                });
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }).start();
+    }
+
+    private void pintarRutaBellmanFord(String origenNombre, String destinoNombre) {
+        new Thread(() -> {
+            try {
+                GrafoTDA base = new GrafoChiapas().getGrafo();
+                Vertice origen = findVertice(base, origenNombre);
+                Vertice destino = findVertice(base, destinoNombre);
+
+                // Ejecuta y reconstruye
+                BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
+                List<Arista> camino = BellmanFord.reconstruirCamino(res, destino);
+
+                GrafoTDA sub = new GrafoTDA();
+                base.obtenerVertices().forEach(sub::agregarVertice);
+
+                for (Arista ar : camino) {
+                    sub.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
+                    SwingUtilities.invokeLater(() -> repaintSubGrafo(sub));
+                    Thread.sleep(800);
+                }
+                List<String> rutaConPesos = new ArrayList<>();
+                // Reconstruimos la secuencia de vértices usando previos
+                List<Vertice> verticesCamino = new ArrayList<>();
+                Vertice paso = destino;
+                while (paso != null) {
+                    verticesCamino.add(0, paso);
+                    paso = res.previos.get(paso);
+                }
+                for (Vertice v : verticesCamino) {
+                    double pesoAcum = res.distancias.get(v);
+                    rutaConPesos.add(v.getNombre() + " (" + (int) pesoAcum + ")");
+                }
+                String resumen = String.join(" → ", rutaConPesos);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            "Ruta final de " + origenNombre + " a " + destinoNombre + ":\n" + resumen,
+                            "Camino más corto (Bellman–Ford)",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                });
+
+            } catch (InterruptedException | IllegalArgumentException ex) {
+                SwingUtilities.invokeLater(()
+                        -> JOptionPane.showMessageDialog(this,
+                                ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE)
+                );
+            }
+
+        }).start();
+    }
+
+    private void pintarRutaBellmanFordTodas(String origenNombre) {
+        new Thread(() -> {
+            try {
+                GrafoTDA base = new GrafoChiapas().getGrafo();
+                Vertice origen = findVertice(base, origenNombre);
+
+                BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
+
+                GrafoTDA caminos = BellmanFord.caminoMasCortoTodas(base, origen);
+                Set<String> vistos = new HashSet<>();
+
+                List<Vertice> ordenadosBF = new ArrayList<>(caminos.obtenerVertices());
+                ordenadosBF.sort(Comparator.comparing(Vertice::getNombre));
+
+                for (Vertice u : ordenadosBF) {
+                    List<Arista> ady = new ArrayList<>(caminos.obtenerAdyacentes(u));
+                    ady.sort(Comparator
+                            .comparing((Arista a) -> a.getDestino().getNombre())
+                    );
+                    for (Arista a : caminos.obtenerAdyacentes(u)) {
+                        String key = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
+                        String rev = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
+                        if (vistos.contains(key) || vistos.contains(rev)) {
+                            continue;
+                        }
+                        vistos.add(key);
+
+                        GrafoTDA parcial = new GrafoTDA();
+                        base.obtenerVertices().forEach(parcial::agregarVertice);
+                        vistos.forEach(k -> {
+                            String[] p = k.split("-");
+                            Vertice x = findVertice(base, p[0]);
+                            Vertice y = findVertice(base, p[1]);
+                            double w = caminos.obtenerAdyacentes(x).stream()
+                                    .filter(ar -> ar.getDestino().equals(y))
+                                    .findFirst().get().getDistancia();
+                            parcial.agregarArista(x, y, w);
+                        });
+
+                        SwingUtilities.invokeLater(() -> repaintSubGrafo(parcial));
+                        Thread.sleep(800);
+                    }
+
+                }
+                // 4) Tras la animación, construimos la salida textual con pesos
+                StringBuilder sb = new StringBuilder("Rutas más cortas desde " + origenNombre + ":\n");
+                List<Vertice> todos = new ArrayList<>(base.obtenerVertices());
+                todos.sort(Comparator.comparing(Vertice::getNombre));
+                for (Vertice destino : todos) {
+                    if (destino.equals(origen)) {
+                        continue;
+                    }
+
+                    // reconstruye la secuencia de vértices origen→destino
+                    List<Vertice> sec = new ArrayList<>();
+                    Vertice paso = destino;
+                    while (paso != null) {
+                        sec.add(0, paso);
+                        paso = res.previos.get(paso);
+                    }
+                    // formatea cada vértice con su distancia acumulada
+                    List<String> partes = sec.stream()
+                            .map(v -> v.getNombre() + " (" + (int) Math.round(res.distancias.get(v)) + ")")
+                            .collect(Collectors.toList());
+
+                    sb.append("- ").append(String.join(" → ", partes)).append("\n");
+                }
+
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            sb.toString(),
+                            "Caminos más cortos desde " + origenNombre,
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                });
+            } catch (InterruptedException ignore) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+
+    // === Helpers ===
+    private Vertice findVertice(GrafoTDA g, String nombre) {
+        return g.obtenerVertices().stream()
+                .filter(v -> v.getNombre().equals(nombre))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException(nombre));
+    }
+
+    private void repaintSubGrafo(GrafoTDA sub) {
+        removeCurrentGrafoPanel();
+        add(PanelGrafo.obtenerGrafoPintado(sub), BorderLayout.CENTER);
+        revalidate();
+        repaint();
     }
 
 }
