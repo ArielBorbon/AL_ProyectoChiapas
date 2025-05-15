@@ -9,6 +9,8 @@ Implementacion\GrafoTDA.class
 GUI\PanelRecorrer.class
 Algoritmos\MST\Kruskal.class
 Algoritmos\Busqueda\BFS.class
+GUI\PanelVisualizar$1.class
+GUI\PanelVisualizar$ModeloTabla.class
 Implementacion\Main.class
 Implementacion\Vertice.class
 GUI\GrafoChiapas.class

@@ -68,8 +68,8 @@ public final class BFS {
 
         while (!cola.isEmpty()) {
             Vertice u = cola.poll();
-            System.out.println("Procesando vértice: " + u.getNombre());
-            Thread.sleep(500);
+//            System.out.println("Procesando vértice: " + u.getNombre());
+//            Thread.sleep(500);
             int nl = nivel.get(u);
             for (Arista a : grafo.obtenerAdyacentes(u)) {
                 Vertice v = a.getDestino();
@@ -89,8 +89,8 @@ public final class BFS {
                 }
             }
             color.put(u, ColorVertice.NEGRO);
-            System.out.println("Terminando vértice: " + u.getNombre());
-            Thread.sleep(300);
+//            System.out.println("Terminando vértice: " + u.getNombre());
+//            Thread.sleep(300);
         }
 
         return new Resultado(orden, arbol, nivel);

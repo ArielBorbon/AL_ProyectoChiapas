@@ -85,6 +85,7 @@ public final class DFS {
         Resultado res = ejecutar(grafo, semilla);
         return res.arbol;
     }
+    
 
     private static void dfsVisitar(
             GrafoTDA grafo,
@@ -95,8 +96,8 @@ public final class DFS {
 
         color.put(u, ColorVertice.GRIS);
 
-        System.out.println("Entrando en DFS: " + u.getNombre());
-        Thread.sleep(500);
+//        System.out.println("Entrando en DFS: " + u.getNombre());
+//        Thread.sleep(500);
 
         orden.add(u);
 
@@ -104,9 +105,9 @@ public final class DFS {
             Vertice v = a.getDestino();
             if (color.get(v) == ColorVertice.BLANCO) {
 
-                System.out.println("  Arista de árbol DFS: "
-                        + u.getNombre() + " → " + v.getNombre());
-                Thread.sleep(500);
+//                System.out.println("  Arista de árbol DFS: "
+//                        + u.getNombre() + " → " + v.getNombre());
+//                Thread.sleep(500);
 
                 arbol.get(u).add(new Arista(u, v, a.getDistancia()));
                 arbol.get(v).add(new Arista(v, u, a.getDistancia()));
@@ -115,7 +116,7 @@ public final class DFS {
         }
 
         color.put(u, ColorVertice.NEGRO);
-        System.out.println("Saliendo de DFS: " + u.getNombre());
-        Thread.sleep(300);
+//        System.out.println("Saliendo de DFS: " + u.getNombre());
+//        Thread.sleep(300);
     }
 }
