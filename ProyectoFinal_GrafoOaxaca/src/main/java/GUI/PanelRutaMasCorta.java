@@ -109,7 +109,6 @@ public class PanelRutaMasCorta extends JPanel {
             }
         });
 
-        // --- Bellman–Ford ---
         btnBF.addActionListener(e
                 -> {
             JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -118,12 +117,10 @@ public class PanelRutaMasCorta extends JPanel {
             }
             MenuPrincipal menu = (MenuPrincipal) ventana;
 
-            // 1) Elegir modalidad
             ModalRutaMasCorta modalOpc = new ModalRutaMasCorta(menu, true);
             modalOpc.mostrarModal();
             this.opcion = modalOpc.getOpcion();
 
-            // 2) Seleccionar origen (y destino si aplica)
             String ciudadOrigen = "";
             String ciudadDestino = "";
             if (opcion == OPCION_DOS_CIUDADES) {
@@ -198,7 +195,6 @@ public class PanelRutaMasCorta extends JPanel {
 
                 double acumulado = 0;
                 List<String> rutaConPesos = new ArrayList<>();
-                // Añadimos el origen con peso 0
                 rutaConPesos.add(origenNombre + " (0)");
 
                 List<String> nombresRuta = new ArrayList<>();
@@ -234,10 +230,7 @@ public class PanelRutaMasCorta extends JPanel {
                     );
                 });
 
-                // System.out.println("Ruta Dijkstra: "
-                //        + camino.stream()
-                //               .map(a -> a.getOrigen().getNombre() + "→" + a.getDestino().getNombre())
-                //              .collect(Collectors.joining(", ")));
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -267,11 +260,9 @@ public class PanelRutaMasCorta extends JPanel {
 
                 List<Arista> todas = new ArrayList<>();
 
-                // crea una lista ordenada por nombre
                 List<Vertice> ordenados = new ArrayList<>(caminos.obtenerVertices());
                 ordenados.sort(Comparator.comparing(Vertice::getNombre));
 
-                // itera en orden lexicográfico
                 for (Vertice u : ordenados) {
                     todas.addAll(caminos.obtenerAdyacentes(u));
                     List<Arista> ady = new ArrayList<>(caminos.obtenerAdyacentes(u));
@@ -327,7 +318,6 @@ public class PanelRutaMasCorta extends JPanel {
                         continue;
                     }
 
-                    // Reconstruimos la lista de vértices del camino
                     List<Vertice> caminoV = new ArrayList<>();
                     Vertice paso = destino;
                     while (paso != null) {
@@ -335,7 +325,6 @@ public class PanelRutaMasCorta extends JPanel {
                         paso = resultadoPrevia.previos.get(paso);
                     }
 
-                    // Ahora formateamos cada vértice con su distancia acumulada
                     List<String> partes = new ArrayList<>();
                     for (Vertice v : caminoV) {
                         double pesoAcum = resultadoPrevia.distancias.get(v);
@@ -346,7 +335,6 @@ public class PanelRutaMasCorta extends JPanel {
                             .append("\n");
                 }
 
-                // 5) Mostramos el cuadro final con pesos
                 SwingUtilities.invokeLater(() -> {
                     JOptionPane.showMessageDialog(this,
                             sb.toString(),
@@ -367,7 +355,6 @@ public class PanelRutaMasCorta extends JPanel {
                 Vertice origen = findVertice(base, origenNombre);
                 Vertice destino = findVertice(base, destinoNombre);
 
-                // Ejecuta y reconstruye
                 BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
                 List<Arista> camino = BellmanFord.reconstruirCamino(res, destino);
 
@@ -380,7 +367,7 @@ public class PanelRutaMasCorta extends JPanel {
                     Thread.sleep(800);
                 }
                 List<String> rutaConPesos = new ArrayList<>();
-                // Reconstruimos la secuencia de vértices usando previos
+                
                 List<Vertice> verticesCamino = new ArrayList<>();
                 Vertice paso = destino;
                 while (paso != null) {
@@ -454,7 +441,6 @@ public class PanelRutaMasCorta extends JPanel {
                     }
 
                 }
-                // 4) Tras la animación, construimos la salida textual con pesos
                 StringBuilder sb = new StringBuilder("Rutas más cortas desde " + origenNombre + ":\n");
                 List<Vertice> todos = new ArrayList<>(base.obtenerVertices());
                 todos.sort(Comparator.comparing(Vertice::getNombre));
@@ -463,14 +449,12 @@ public class PanelRutaMasCorta extends JPanel {
                         continue;
                     }
 
-                    // reconstruye la secuencia de vértices origen→destino
                     List<Vertice> sec = new ArrayList<>();
                     Vertice paso = destino;
                     while (paso != null) {
                         sec.add(0, paso);
                         paso = res.previos.get(paso);
                     }
-                    // formatea cada vértice con su distancia acumulada
                     List<String> partes = sec.stream()
                             .map(v -> v.getNombre() + " (" + (int) Math.round(res.distancias.get(v)) + ")")
                             .collect(Collectors.toList());
@@ -491,7 +475,6 @@ public class PanelRutaMasCorta extends JPanel {
         }).start();
     }
 
-    // === Helpers ===
     private Vertice findVertice(GrafoTDA g, String nombre) {
         return g.obtenerVertices().stream()
                 .filter(v -> v.getNombre().equals(nombre))

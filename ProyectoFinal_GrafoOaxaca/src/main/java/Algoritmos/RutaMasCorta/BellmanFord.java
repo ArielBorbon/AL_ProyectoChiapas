@@ -164,16 +164,12 @@ public final class BellmanFord {
 
     public static GrafoTDA caminoMasCortoTodas(GrafoTDA grafo, Vertice origen)
             throws InterruptedException {
-        // Ejecutamos Bellman–Ford para llenar distancias y previos
         Resultado res = ejecutar(grafo, origen);
 
-        // Creamos el grafo de salida
         GrafoTDA subGrafo = new GrafoTDA();
-        // 1) Agregar todos los vértices
         for (Vertice v : grafo.obtenerVertices()) {
             subGrafo.agregarVertice(v);
         }
-        // 2) Para cada vértice (excepto la fuente), añadimos la arista mínimo prev→v
         for (Vertice v : grafo.obtenerVertices()) {
             Vertice padre = res.previos.get(v);
             if (padre != null) {

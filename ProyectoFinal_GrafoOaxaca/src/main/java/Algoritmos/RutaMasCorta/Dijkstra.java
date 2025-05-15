@@ -89,7 +89,6 @@ public final class Dijkstra {
         PriorityQueue<DistanciaNodo> pq
                 = new PriorityQueue<>(Comparator.comparingDouble(DistanciaNodo::getDistancia));
 
-        // Inicialización
         for (Vertice v : grafo.obtenerVertices()) {
             dist.put(v, Double.POSITIVE_INFINITY);
             prev.put(v, null);
@@ -97,7 +96,6 @@ public final class Dijkstra {
         dist.put(origen, 0.0);
         pq.add(new DistanciaNodo(origen, 0.0));
 
-        // Algoritmo
         while (!pq.isEmpty()) {
             DistanciaNodo dn = pq.poll();
             Vertice u = dn.getNodo();
