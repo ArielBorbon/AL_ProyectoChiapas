@@ -11,13 +11,18 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableRowSorter;
 
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
@@ -122,13 +127,15 @@ public class PanelVisualizar extends JPanel {
 private void mostrarTabla() {
     String[][] datos = obtenerDatosTabla();
     String[] columnas = {"Origen", "Destino", "Distancia"};
-   
 
-    JTable tabla = new JTable(datos, columnas);
+    ModeloTabla modelo = new ModeloTabla(convertirADatosNumericos(datos), columnas);
+    JTable tabla = new JTable(modelo);
     JScrollPane scrollPane = new JScrollPane(tabla);
+
+    // Estilo visual
     tabla.setFont(new Font("SansSerif", Font.PLAIN, 14));
     tabla.setRowHeight(28);
-     JTableHeader header = tabla.getTableHeader();
+    JTableHeader header = tabla.getTableHeader();
     header.setFont(new Font("SansSerif", Font.BOLD, 16));
     header.setBackground(new Color(60, 130, 180));
     header.setForeground(Color.WHITE);
@@ -136,35 +143,108 @@ private void mostrarTabla() {
     tabla.setShowVerticalLines(false);
     tabla.setIntercellSpacing(new Dimension(0, 0));
     scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    // Estilo de celdas
     tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
 
-        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        if (isSelected) {
-            c.setBackground(new Color(186, 228, 255)); // celeste claro al seleccionar
-        } else if (row % 2 == 0) {
-            c.setBackground(new Color(245, 245, 245)); // gris claro
-        } else {
-            c.setBackground(Color.WHITE); // blanco
+            if (isSelected) {
+                c.setBackground(new Color(186, 228, 255));
+            } else if (row % 2 == 0) {
+                c.setBackground(new Color(245, 245, 245));
+            } else {
+                c.setBackground(Color.WHITE);
+            }
+
+            return c;
         }
+    });
 
-        return c;
-    }
-});
+    // Ordenador
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(modelo);
+    tabla.setRowSorter(sorter);
 
-    // Elimina lo que haya actualmente en el centro (por ejemplo, el grafo visual)
+    // ComboBox para ordenar alfabéticamente
+    String[] opcionesAlfabetico = {"Ordenar por Origen: A-Z", "Ordenar por Origen: Z-A"};
+    JComboBox<String> comboAlfabetico = new JComboBox<>(opcionesAlfabetico);
+
+    comboAlfabetico.addActionListener(e -> {
+        if (comboAlfabetico.getSelectedIndex() == 0) {
+            sorter.setSortKeys(List.of(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        } else {
+            sorter.setSortKeys(List.of(new RowSorter.SortKey(0, SortOrder.DESCENDING)));
+        }
+    });
+
+    // ComboBox para ordenar por distancia
+    String[] opcionesDistancia = {"Ordenar por Distancia: Menor a Mayor", "Ordenar por Distancia: Mayor a Menor"};
+    JComboBox<String> comboDistancia = new JComboBox<>(opcionesDistancia);
+
+    comboDistancia.addActionListener(e -> {
+        if (comboDistancia.getSelectedIndex() == 0) {
+            sorter.setSortKeys(List.of(new RowSorter.SortKey(2, SortOrder.ASCENDING)));
+        } else {
+            sorter.setSortKeys(List.of(new RowSorter.SortKey(2, SortOrder.DESCENDING)));
+        }
+    });
+
+    // Panel para comboboxes
+    JPanel panelFiltros = new JPanel(new GridLayout(1, 2, 10, 10));
+    panelFiltros.add(comboAlfabetico);
+    panelFiltros.add(comboDistancia);
+    panelFiltros.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    // Reemplazar el contenido actual
     Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
     if (panelCentral != null) {
         remove(panelCentral);
     }
 
+    Component panelArriba = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.NORTH);
+    if (panelArriba != null) {
+        remove(panelArriba);
+    }
+
+    add(panelFiltros, BorderLayout.NORTH);
     add(scrollPane, BorderLayout.CENTER);
     revalidate();
     repaint();
 }
+private Object[][] convertirADatosNumericos(String[][] datos) {
+    Object[][] resultado = new Object[datos.length][datos[0].length];
+
+    for (int i = 0; i < datos.length; i++) {
+        resultado[i][0] = datos[i][0];
+        resultado[i][1] = datos[i][1];
+        resultado[i][2] = Double.parseDouble(datos[i][2]); // convierte a número
+    }
+
+    return resultado;
+}
+
+class ModeloTabla extends DefaultTableModel {
+    public ModeloTabla(Object[][] data, Object[] columnNames) {
+        super(data, columnNames);
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        if (columnIndex == 2) { // Distancia
+            return Double.class;
+        }
+        return String.class;
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false; // hace que las celdas no sean editables
+    }
+}
+
 
 
 }
