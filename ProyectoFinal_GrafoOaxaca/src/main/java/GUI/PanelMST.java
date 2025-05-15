@@ -1,11 +1,17 @@
 package GUI;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import Algoritmos.MST.Boruvka;
 import Algoritmos.MST.Kruskal;
 import Implementacion.GrafoTDA;
-
-import java.awt.*;
 
 public class PanelMST extends JPanel {
 
@@ -60,6 +66,10 @@ public class PanelMST extends JPanel {
         btnKruskal.addActionListener(e -> {
             pintarMSTKruskal();
         });
+       btnBoruvka.addActionListener(e -> pintarMSTBoruvka());
+
+
+
 
     }
 
@@ -78,6 +88,24 @@ public class PanelMST extends JPanel {
             }
         }).start();
     }
+   private void pintarMSTBoruvka() {
+    new Thread(() -> {
+        try {
+            Boruvka boruvka = new Boruvka(new GrafoChiapas().getGrafo());
+            boruvka.start(); // iniciar el hilo
+            while (boruvka.isAlive()) {
+                Thread.sleep(1000); // tiempo para visualizar iteraciones si quieres mostrar progreso
+                GrafoTDA mst = boruvka.getMST(); 
+                SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }).start();
+}
+
+
+
 
     private void mostrarGrafoPintado(GrafoTDA grafoPintado) {
         JPanel panelGrafo = PanelGrafo.obtenerGrafoPintado(grafoPintado);

@@ -54,6 +54,7 @@ public class PanelGrafo {
 
         return createPanelGrafo(grafoChiapasVisual);
     }
+    
 
     public static JPanel createPanelGrafo(Graph grafo) {
         // Crear y devolver el panel de visualizació
@@ -100,7 +101,7 @@ public class PanelGrafo {
                     fill-color: black;
                 }
                 edge.highlighted {
-                    fill-color: green;
+                    fill-color: red;
                 }
                 """);
         return grafo;
