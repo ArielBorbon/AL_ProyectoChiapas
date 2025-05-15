@@ -1,5 +1,6 @@
 GUI\PanelRutaMasCorta.class
 GUI\PanelesRecorrer\PanelBFS.class
+Algoritmos\Busqueda\BFS$Resultado.class
 GUI\PanelGrafo.class
 Algoritmos\MST\Boruvka.class
 GUI\PanelesRecorrer\PanelDFS.class
@@ -23,6 +24,7 @@ GUI\PanelReportes.class
 GUI\PanelesMST\PanelPrim.class
 GUI\PanelesRutaCorta\PanelBellmanFord.class
 GUI\PanelDefault.class
+Algoritmos\Busqueda\DFS$Resultado.class
 Algoritmos\RutaMasCorta\BellmanFord$Resultado.class
 GUI\Estilos.class
 GUI\PanelesMST\PanelBoruvka.class
