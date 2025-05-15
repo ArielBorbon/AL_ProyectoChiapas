@@ -1,4 +1,5 @@
 GUI\PanelRutaMasCorta.class
+GUI\ModalSeleccionarFuente.class
 GUI\PanelesRecorrer\PanelBFS.class
 Algoritmos\Busqueda\BFS$Resultado.class
 GUI\PanelGrafo.class
@@ -23,11 +24,14 @@ Implementacion\ColorVertice.class
 GUI\PanelReportes.class
 GUI\PanelesMST\PanelPrim.class
 GUI\PanelesRutaCorta\PanelBellmanFord.class
+GUI\ModalRutaMasCorta.class
+GUI\ModalSeleccionarFuente$1.class
 GUI\PanelDefault.class
 Algoritmos\Busqueda\DFS$Resultado.class
 Algoritmos\RutaMasCorta\BellmanFord$Resultado.class
 GUI\Estilos.class
 GUI\PanelesMST\PanelBoruvka.class
+GUI\ModalRutaMasCorta$1.class
 GUI\Estilos$1.class
 Algoritmos\RutaMasCorta\Dijkstra$DistanciaNodo.class
 Algoritmos\RutaMasCorta\Dijkstra.class

@@ -28,7 +28,7 @@ public class PanelMST extends JPanel {
         JButton btnKruskal = Estilos.crearBoton("Usar algoritmo de Kruskal");
         JButton btnPrim = Estilos.crearBoton("Usar algoritmo de Prim");
         JButton btnBoruvka = Estilos.crearBoton("Usar algoritmo de Boruvka");
-        JButton btnVolver = Estilos.crearBoton("Vovler");
+        JButton btnVolver = Estilos.crearBoton("Volver");
         // panel de botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new GridLayout(1, 4, 10, 10));
