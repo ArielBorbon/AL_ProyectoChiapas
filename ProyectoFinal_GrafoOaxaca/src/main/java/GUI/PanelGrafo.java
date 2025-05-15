@@ -91,17 +91,20 @@ public class PanelGrafo {
         // Aplicar estilos al grafo
         grafo.setAttribute("ui.stylesheet", """
                 node {
-                    text-size: 10px;
-                    fill-color: yellow;
+                    text-size: 14px;
+                    fill-color: rgb(134,192,160);
                     size: 40px;
                     text-alignment: center;
                 }
                 edge {
-                    text-size: 12px;
-                    fill-color: black;
+                    text-size: 14px;
+                    fill-color: rgb(130,130,130);
+                    size: 3px;
+
                 }
                 edge.highlighted {
-                    fill-color: red;
+                    fill-color: rgb(255,160,122);
+
                 }
                 """);
         return grafo;
