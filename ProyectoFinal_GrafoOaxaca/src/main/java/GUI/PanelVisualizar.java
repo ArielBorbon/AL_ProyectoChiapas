@@ -62,7 +62,7 @@ public class PanelVisualizar extends JPanel {
 });
 
         btnGrafo.addActionListener(e -> {
-
+            mostrarGrafo();
         });
         btnVolver.addActionListener(e -> {
             // Obtener el JFrame (ventana) que contiene este panel
