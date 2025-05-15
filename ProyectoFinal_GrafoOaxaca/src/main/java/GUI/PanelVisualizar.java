@@ -171,6 +171,9 @@ private void mostrarTabla() {
     // ComboBox para ordenar alfabéticamente
     String[] opcionesAlfabetico = {"Ordenar por Origen: A-Z", "Ordenar por Origen: Z-A"};
     JComboBox<String> comboAlfabetico = new JComboBox<>(opcionesAlfabetico);
+    comboAlfabetico.setBackground(new java.awt.Color(221, 221, 221));
+    comboAlfabetico.setFont(new java.awt.Font("Segoe UI", 0, 14));
+    comboAlfabetico.setForeground(new java.awt.Color(0, 0, 0));
 
     comboAlfabetico.addActionListener(e -> {
         if (comboAlfabetico.getSelectedIndex() == 0) {
@@ -183,6 +186,10 @@ private void mostrarTabla() {
     // ComboBox para ordenar por distancia
     String[] opcionesDistancia = {"Ordenar por Distancia: Menor a Mayor", "Ordenar por Distancia: Mayor a Menor"};
     JComboBox<String> comboDistancia = new JComboBox<>(opcionesDistancia);
+    comboDistancia.setBackground(new java.awt.Color(221, 221, 221));
+    comboDistancia.setFont(new java.awt.Font("Segoe UI", 0, 14));
+    comboDistancia.setForeground(new java.awt.Color(0, 0, 0));
+    
 
     comboDistancia.addActionListener(e -> {
         if (comboDistancia.getSelectedIndex() == 0) {
