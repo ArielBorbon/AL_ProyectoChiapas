@@ -1,7 +1,9 @@
 package Implementacion;
 
+import java.util.Objects;
+
 public class Vertice {
-    
+
     private String nombre;
     private ColorVertice color;
     private Vertice anterior;
@@ -65,6 +67,12 @@ public class Vertice {
             return false;
         }
         Vertice vertice = (Vertice) obj;
-        return nombre.equals(vertice.nombre);
+        return Objects.equals(nombre, vertice.nombre);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre);
+    }
+
 }
