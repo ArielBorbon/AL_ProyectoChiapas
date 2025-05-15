@@ -1,7 +1,13 @@
 package GUI;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 
 public class PanelVisualizar extends JPanel {
@@ -15,7 +21,7 @@ public class PanelVisualizar extends JPanel {
         // configuracion del panel
         setLayout(new BorderLayout());
         // creacion de los botones
-        JButton btnTabla = Estilos.crearBoton("Mostrar tabla de nosos y aristas");
+        JButton btnTabla = Estilos.crearBoton("Mostrar tabla de nodos y aristas");
         JButton btnGrafo = Estilos.crearBoton("Mostrar grafo de forma visual");
         JButton btnVolver = Estilos.crearBoton("Volver");
         // creacion del panel de los botones
