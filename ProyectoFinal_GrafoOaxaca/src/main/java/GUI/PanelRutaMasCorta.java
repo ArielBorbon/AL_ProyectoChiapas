@@ -5,6 +5,11 @@ import java.awt.*;
 
 public class PanelRutaMasCorta extends JPanel {
 
+    public static final int OPCION_UNA_CIUDAD = 0;
+    public static final int OPCION_DOS_CIUDADES = 1;
+
+    private int opcion;
+
     public PanelRutaMasCorta(){
         initComponents();
         mostrarGrafo();
@@ -48,16 +53,32 @@ public class PanelRutaMasCorta extends JPanel {
                 menu.repaint();
             }
         });
+
+        btnDJK.addActionListener(e -> {
+            // Obtener el JFrame (ventana) que contiene este panel
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+            if (ventana instanceof MenuPrincipal) {
+                MenuPrincipal menu = (MenuPrincipal) ventana;
+
+                ModalRutaMasCorta modalOpciones = new ModalRutaMasCorta(menu, true);
+                modalOpciones.mostrarModal();
+                this.opcion = modalOpciones.getOpcion();
+
+                ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);
+                modalSeleccionarFuente.mostrar();
+                String ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();
+                String ciudadDestino = modalSeleccionarFuente.getCiudadDestino();
+            }
+        });
     }
     private void mostrarGrafo() {
         JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
-        
         
         Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (panelCentral != null) {
             remove(panelCentral);
         }
-
         add(panelGrafo, BorderLayout.CENTER);
 
         revalidate();
