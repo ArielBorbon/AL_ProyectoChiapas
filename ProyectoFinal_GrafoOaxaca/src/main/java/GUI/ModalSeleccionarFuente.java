@@ -1,5 +1,9 @@
 package GUI;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import Implementacion.Vertice;
 
 public class ModalSeleccionarFuente extends javax.swing.JDialog {
@@ -24,10 +28,21 @@ public class ModalSeleccionarFuente extends javax.swing.JDialog {
         GrafoChiapas grafo = new GrafoChiapas();
         comboBoxOrigen.removeAllItems();
         comboBoxDestino.removeAllItems();
-        for (Vertice vertice : grafo.getCiudades()) {
-            comboBoxOrigen.addItem(vertice.getNombre());
-            comboBoxDestino.addItem(vertice.getNombre());
-        }
+        // Primero, crea una lista temporal de Strings
+List<String> nombres = new ArrayList<>();
+for (Vertice vertice : grafo.getCiudades()) {
+    nombres.add(vertice.getNombre());
+}
+
+// Ordena alfabéticamente
+Collections.sort(nombres);
+
+// Ahora agrega los nombres ordenados al combo
+for (String nombre : nombres) {
+    comboBoxOrigen.addItem(nombre);
+    comboBoxDestino.addItem(nombre);
+}
+
         if (tipo == FUENTE) {
             lblOrigen.setText("Seleccionar Ciudad:");
             esconderDestino();
