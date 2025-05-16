@@ -11,14 +11,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.ui.swing_viewer.SwingViewer;
+import org.graphstream.ui.swing_viewer.ViewPanel;
 
 public class PanelRutaMasCorta extends JPanel {
 
@@ -171,67 +176,88 @@ public class PanelRutaMasCorta extends JPanel {
     private void pintarRutaDijkstra(String origenNombre, String destinoNombre) {
         new Thread(() -> {
             try {
-                GrafoTDA grafoBase = new GrafoChiapas().getGrafo();
+                GrafoTDA base = new GrafoChiapas().getGrafo();
+                Vertice origen = findVertice(base, origenNombre);
+                Vertice destino = findVertice(base, destinoNombre);
 
-                Vertice origen = grafoBase.obtenerVertices().stream()
-                        .filter(v -> v.getNombre().equals(origenNombre))
-                        .findFirst()
-                        .orElseThrow();
-                Vertice destino = grafoBase.obtenerVertices().stream()
-                        .filter(v -> v.getNombre().equals(destinoNombre))
-                        .findFirst()
-                        .orElseThrow();
+                Dijkstra.ResultadoPrevia previa = Dijkstra.ejecutarPrevia(base, origen);
+                List<Arista> camino = Dijkstra.caminoMasCortoListaAristas(base, origen, destino);
 
-                List<Arista> camino = Dijkstra.caminoMasCortoListaAristas(grafoBase, origen, destino);
-
-                GrafoTDA subGrafo = new GrafoTDA();
-
-                List<Vertice> ciudades = new ArrayList<>(grafoBase.obtenerVertices());
-                ciudades.sort(Comparator.comparing(Vertice::getNombre));
-                for (Vertice v : ciudades) {
-                    subGrafo.agregarVertice(v);
-
+                System.setProperty("org.graphstream.ui", "swing");
+                Graph graph = PanelGrafo.crearGrafoChiapas();
+                graph.setAttribute("ui.stylesheet", """
+                node {
+                  fill-color: rgb(134,192,160);
+                  size: 30px; text-alignment: center; text-size: 12px;
                 }
+                node.gris  { fill-color: orange; }
+                node.negro { fill-color: gray;   }
+                edge { fill-color: rgb(130,130,130); size: 2px; }
+                edge.highlighted { fill-color: red; size: 4px; }
+            """);
 
-                double acumulado = 0;
-                List<String> rutaConPesos = new ArrayList<>();
-                rutaConPesos.add(origenNombre + " (0)");
-
-                List<String> nombresRuta = new ArrayList<>();
-                for (Arista ar : camino) {
-                    acumulado += ar.getDistancia();
-                    rutaConPesos.add(ar.getDestino().getNombre() + " (" + (int) acumulado + ")");
-                    subGrafo.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
-
-                    if (nombresRuta.isEmpty()) {
-                        nombresRuta.add(ar.getOrigen().getNombre());
-                    }
-                    nombresRuta.add(ar.getDestino().getNombre());
-                    subGrafo.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
-
-                    SwingUtilities.invokeLater(() -> {
-                        JPanel panel = PanelGrafo.obtenerGrafoPintado(subGrafo);
-                        removeCurrentGrafoPanel();
-                        add(panel, BorderLayout.CENTER);
-                        revalidate();
-                        repaint();
-                    });
-
-                    Thread.sleep(1000);
-                }
-
-                String resumenRuta = String.join(" -> ", rutaConPesos);
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+                viewer.disableAutoLayout();
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
 
                 SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(this,
-                            "Ruta final de " + origenNombre + " a " + destinoNombre + ":\n" + resumenRuta,
-                            "Camino más corto (Dijkstra)",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
+                    removeCurrentGrafoPanel();
+                    add(panel, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
                 });
 
+                Vertice anterior = null;
+                for (Arista ar : camino) {
+                    graph.getNode(ar.getDestino().getNombre())
+                            .setAttribute("ui.class", "gris");
 
-            } catch (InterruptedException e) {
+                    String id1 = ar.getOrigen().getNombre() + "-" + ar.getDestino().getNombre();
+                    String id2 = ar.getDestino().getNombre() + "-" + ar.getOrigen().getNombre();
+                    Edge e = graph.getEdge(id1);
+                    if (e == null) {
+                        e = graph.getEdge(id2);
+                    }
+
+                    if (e != null) {
+                        e.setAttribute("ui.class", "highlighted");
+                        e.setAttribute("ui.label", ar.getDistancia());
+                    } else {
+                        System.err.println("Arista no encontrada: " + id1 + "/" + id2);
+                    }
+
+                    Thread.sleep(1200);
+
+                    if (anterior != null) {
+                        graph.getNode(anterior.getNombre())
+                                .setAttribute("ui.class", "negro");
+                    }
+                    anterior = ar.getDestino();
+                }
+
+                if (anterior != null) {
+                    graph.getNode(anterior.getNombre())
+                            .setAttribute("ui.class", "negro");
+                }
+
+                Map<Vertice, Double> distAcum = previa.distancias;
+                List<Vertice> secuencia = new ArrayList<>();
+                for (Vertice v = destino; v != null; v = previa.previos.get(v)) {
+                    secuencia.add(0, v);
+                }
+
+                String texto = secuencia.stream()
+                        .map(v -> v.getNombre() + " (" + (int) Math.round(distAcum.getOrDefault(v, 0.0)) + ")")
+                        .collect(Collectors.joining(" → "));
+
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                        this,
+                        "Ruta " + origenNombre + " → " + destinoNombre + ":\n" + texto,
+                        "Dijkstra",
+                        JOptionPane.INFORMATION_MESSAGE
+                ));
+
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }).start();
@@ -247,101 +273,88 @@ public class PanelRutaMasCorta extends JPanel {
         }
     }
 
+    private Vertice findVertice(GrafoTDA grafo, String nombre) {
+        return grafo.obtenerVertices().stream()
+                .filter(v -> v.getNombre().equals(nombre))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                "No se encontró el vértice con nombre: " + nombre));
+    }
+
     private void pintarRutaDijkstraTodas(String origenNombre) {
         new Thread(() -> {
             try {
                 GrafoTDA base = new GrafoChiapas().getGrafo();
-                Vertice origen = base.obtenerVertices().stream()
-                        .filter(v -> v.getNombre().equals(origenNombre))
-                        .findFirst().orElseThrow();
+                Vertice origen = findVertice(base, origenNombre);
 
-                Dijkstra.ResultadoPrevia resultadoPrevia = Dijkstra.ejecutarPrevia(base, origen);
-                GrafoTDA caminos = Dijkstra.caminoMasCortoTodas(base, origen);
+                Dijkstra.ResultadoPrevia res = Dijkstra.ejecutarPrevia(base, origen);
+                GrafoTDA subGrafoCompleto = Dijkstra.caminoMasCortoTodas(base, origen);
+                Map<Vertice, Double> distAcum = res.distancias;
 
-                List<Arista> todas = new ArrayList<>();
+                System.setProperty("org.graphstream.ui", "swing");
+                Graph graph = PanelGrafo.crearGrafoChiapas();
+                graph.setAttribute("ui.stylesheet", """
+                node {
+                  fill-color: rgb(134,192,160);
+                  size: 30px; text-alignment: center; text-size: 12px;
+                }
+                node.gris  { fill-color: orange; }
+                node.negro { fill-color: gray;   }
+                edge { fill-color: rgb(130,130,130); size: 2px; }
+                edge.highlighted { fill-color: red; size: 4px; }
+            """);
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+                viewer.disableAutoLayout();
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
+                SwingUtilities.invokeLater(() -> {
+                    removeCurrentGrafoPanel();
+                    add(panel, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                });
 
-                List<Vertice> ordenados = new ArrayList<>(caminos.obtenerVertices());
-                ordenados.sort(Comparator.comparing(Vertice::getNombre));
+                Set<String> vistas = new HashSet<>();
+                for (Vertice u : subGrafoCompleto.obtenerVertices()) {
+                    for (Arista a : subGrafoCompleto.obtenerAdyacentes(u)) {
+                        String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
+                        String id2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
+                        if (vistas.contains(id1) || vistas.contains(id2)) {
+                            continue;
+                        }
+                        vistas.add(id1);
 
-                for (Vertice u : ordenados) {
-                    todas.addAll(caminos.obtenerAdyacentes(u));
-                    List<Arista> ady = new ArrayList<>(caminos.obtenerAdyacentes(u));
-                    ady.sort(Comparator
-                            .comparing((Arista a) -> a.getDestino().getNombre())
-                    );
+                        graph.getNode(a.getDestino().getNombre())
+                                .setAttribute("ui.class", "gris");
+                        Edge e = graph.getEdge(id1);
+                        if (e == null) {
+                            e = graph.getEdge(id2);
+                        }
+                        if (e != null) {
+                            e.setAttribute("ui.class", "highlighted");
+                        }
+
+                        Thread.sleep(1200);
+                    }
                 }
 
-                Set<String> vistos = new HashSet<>();
-                for (Arista a : todas) {
-                    String key = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
-                    String rev = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
-                    if (vistos.contains(key) || vistos.contains(rev)) {
-                        continue;
-                    }
-                    vistos.add(key);
-
-                    GrafoTDA parcial = new GrafoTDA();
-                    List<Vertice> ciudades = new ArrayList<>(base.obtenerVertices());
-                    ciudades.sort(Comparator.comparing(Vertice::getNombre));
-                    for (Vertice v : ciudades) {
-                        parcial.agregarVertice(v);
-                    }
-
-                    for (String agregado : vistos) {
-                        String[] parts = agregado.split("-");
-                        Vertice x = base.obtenerVertices().stream()
-                                .filter(v -> v.getNombre().equals(parts[0])).findFirst().get();
-                        Vertice y = base.obtenerVertices().stream()
-                                .filter(v -> v.getNombre().equals(parts[1])).findFirst().get();
-                        double w = caminos.obtenerAdyacentes(x).stream()
-                                .filter(ar -> ar.getDestino().equals(y))
-                                .findFirst().get().getDistancia();
-                        parcial.agregarArista(x, y, w);
-                    }
-
-                    SwingUtilities.invokeLater(() -> {
-                        removeCurrentGrafoPanel();
-                        add(PanelGrafo.obtenerGrafoPintado(parcial), BorderLayout.CENTER);
-                        revalidate();
-                        repaint();
-                    });
-
-                    Thread.sleep(1000);
-                }
-
-                StringBuilder sb = new StringBuilder("Rutas más cortas desde " + origenNombre + ":\n");
-                ordenados = new ArrayList<>(base.obtenerVertices());
-                ordenados.sort(Comparator.comparing(Vertice::getNombre));
-
-                for (Vertice destino : ordenados) {
+                StringBuilder sb = new StringBuilder("Caminos mínimos desde " + origenNombre + ":\n");
+                List<Vertice> vs = new ArrayList<>(base.obtenerVertices());
+                vs.sort(Comparator.comparing(Vertice::getNombre));
+                for (Vertice destino : vs) {
                     if (destino.equals(origen)) {
                         continue;
                     }
-
-                    List<Vertice> caminoV = new ArrayList<>();
-                    Vertice paso = destino;
-                    while (paso != null) {
-                        caminoV.add(0, paso);
-                        paso = resultadoPrevia.previos.get(paso);
+                    List<String> pasos = new ArrayList<>();
+                    for (Vertice v = destino; v != null; v = res.previos.get(v)) {
+                        pasos.add(0, v.getNombre() + " (" + (int) Math.round(distAcum.getOrDefault(v, 0.0)) + ")");
                     }
-
-                    List<String> partes = new ArrayList<>();
-                    for (Vertice v : caminoV) {
-                        double pesoAcum = resultadoPrevia.distancias.get(v);
-                        partes.add(v.getNombre() + " (" + (int) Math.round(pesoAcum) + ")");
-                    }
-                    sb.append("- ")
-                            .append(String.join(" → ", partes))
-                            .append("\n");
+                    sb.append("• ").append(String.join(" → ", pasos)).append("\n");
                 }
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                        this, sb.toString(),
+                        "Dijkstra — todas", JOptionPane.INFORMATION_MESSAGE
+                ));
 
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(this,
-                            sb.toString(),
-                            "Caminos más cortos desde " + origenNombre,
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                });
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -358,42 +371,92 @@ public class PanelRutaMasCorta extends JPanel {
                 BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
                 List<Arista> camino = BellmanFord.reconstruirCamino(res, destino);
 
-                GrafoTDA sub = new GrafoTDA();
-                base.obtenerVertices().forEach(sub::agregarVertice);
+                System.setProperty("org.graphstream.ui", "swing");
+                Graph graph = PanelGrafo.crearGrafoChiapas();  
+                graph.setAttribute("ui.stylesheet", """
+                node {
+                  fill-color: rgb(134,192,160);
+                  size: 30px;
+                  text-alignment: center;
+                  text-size: 12px;
+                }
+                node.gris  { fill-color: orange; }
+                node.negro { fill-color: gray;   }
+                edge {
+                  fill-color: rgb(130,130,130);
+                  size: 2px;
+                }
+                edge.highlighted {
+                  fill-color: red;
+                  size: 4px;
+                }
+            """);
 
-                for (Arista ar : camino) {
-                    sub.agregarArista(ar.getOrigen(), ar.getDestino(), ar.getDistancia());
-                    SwingUtilities.invokeLater(() -> repaintSubGrafo(sub));
-                    Thread.sleep(800);
-                }
-                List<String> rutaConPesos = new ArrayList<>();
-                
-                List<Vertice> verticesCamino = new ArrayList<>();
-                Vertice paso = destino;
-                while (paso != null) {
-                    verticesCamino.add(0, paso);
-                    paso = res.previos.get(paso);
-                }
-                for (Vertice v : verticesCamino) {
-                    double pesoAcum = res.distancias.get(v);
-                    rutaConPesos.add(v.getNombre() + " (" + (int) pesoAcum + ")");
-                }
-                String resumen = String.join(" → ", rutaConPesos);
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+                viewer.disableAutoLayout();
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
+
                 SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(this,
-                            "Ruta final de " + origenNombre + " a " + destinoNombre + ":\n" + resumen,
-                            "Camino más corto (Bellman–Ford)",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
+                    removeCurrentGrafoPanel();
+                    add(panel, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
                 });
 
-            } catch (InterruptedException | IllegalArgumentException ex) {
+                Vertice anterior = null;
+
+                for (Arista ar : camino) {
+
+                    Node nodoDestino = graph.getNode(ar.getDestino().getNombre());
+                    nodoDestino.setAttribute("ui.class", "gris");
+
+                    String id1 = ar.getOrigen().getNombre() + "-" + ar.getDestino().getNombre();
+                    String id2 = ar.getDestino().getNombre() + "-" + ar.getOrigen().getNombre();
+                    Edge e = graph.getEdge(id1);
+                    if (e == null) {
+                        e = graph.getEdge(id2);
+                    }
+                    if (e == null) {
+                        e = graph.addEdge(id1,
+                                ar.getOrigen().getNombre(),
+                                ar.getDestino().getNombre(),
+                                false);
+                    }
+
+                    e.setAttribute("ui.class", "highlighted");
+                    e.setAttribute("ui.label", ar.getDistancia());
+
+                    Thread.sleep(1200);
+
+                    if (anterior != null) {
+                        graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+                    }
+                    anterior = ar.getDestino();
+                }
+
+                if (anterior != null) {
+                    graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+                }
+
+                List<Vertice> secuencia = new ArrayList<>();
+                for (Vertice v = destino; v != null; v = res.previos.get(v)) {
+                    secuencia.add(0, v);
+                }
+                String texto = secuencia.stream()
+                        .map(v -> v.getNombre() + " (" + (int) Math.round(res.distancias.get(v)) + ")")
+                        .collect(Collectors.joining(" → "));
+
                 SwingUtilities.invokeLater(()
                         -> JOptionPane.showMessageDialog(this,
-                                ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE)
+                                "Ruta " + origenNombre + " → " + destinoNombre + ":\n"
+                                + texto,
+                                "Bellman–Ford",
+                                JOptionPane.INFORMATION_MESSAGE)
                 );
-            }
 
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }).start();
     }
 
@@ -405,88 +468,126 @@ public class PanelRutaMasCorta extends JPanel {
 
                 BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
 
-                GrafoTDA caminos = BellmanFord.caminoMasCortoTodas(base, origen);
-                Set<String> vistos = new HashSet<>();
+                GrafoTDA subGrafoCompleto = BellmanFord.caminoMasCortoTodas(base, origen);
+                Map<Vertice, Double> distAcum = res.distancias;
 
-                List<Vertice> ordenadosBF = new ArrayList<>(caminos.obtenerVertices());
-                ordenadosBF.sort(Comparator.comparing(Vertice::getNombre));
+                System.setProperty("org.graphstream.ui", "swing");
+                Graph graph = PanelGrafo.crearGrafoChiapas();  
 
-                for (Vertice u : ordenadosBF) {
-                    List<Arista> ady = new ArrayList<>(caminos.obtenerAdyacentes(u));
-                    ady.sort(Comparator
-                            .comparing((Arista a) -> a.getDestino().getNombre())
-                    );
-                    for (Arista a : caminos.obtenerAdyacentes(u)) {
-                        String key = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
-                        String rev = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
-                        if (vistos.contains(key) || vistos.contains(rev)) {
-                            continue;
+                graph.setAttribute("ui.stylesheet", """
+                node {
+                  fill-color: rgb(134,192,160);
+                  size: 30px;
+                  text-alignment: center;
+                  text-size: 12px;
+                }
+                node.gris  { fill-color: orange; }
+                node.negro { fill-color: gray;   }
+                edge {
+                  fill-color: rgb(130,130,130);
+                  size: 2px;
+                }
+                edge.highlighted {
+                  fill-color: red;
+                  size: 4px;
+                }
+            """);
+
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+                viewer.disableAutoLayout();
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
+
+                SwingUtilities.invokeLater(() -> {
+                    removeCurrentGrafoPanel();
+                    add(panel, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                });
+
+                Set<String> aristasVistas = new HashSet<>();
+                List<Arista> todasAristas = new ArrayList<>();
+                for (Vertice v : subGrafoCompleto.obtenerVertices()) {
+                    for (Arista a : subGrafoCompleto.obtenerAdyacentes(v)) {
+                        String clave1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
+                        String clave2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
+                        if (!aristasVistas.contains(clave1) && !aristasVistas.contains(clave2)) {
+                            aristasVistas.add(clave1);
+                            todasAristas.add(a);
                         }
-                        vistos.add(key);
+                    }
+                }
 
-                        GrafoTDA parcial = new GrafoTDA();
-                        base.obtenerVertices().forEach(parcial::agregarVertice);
-                        vistos.forEach(k -> {
-                            String[] p = k.split("-");
-                            Vertice x = findVertice(base, p[0]);
-                            Vertice y = findVertice(base, p[1]);
-                            double w = caminos.obtenerAdyacentes(x).stream()
-                                    .filter(ar -> ar.getDestino().equals(y))
-                                    .findFirst().get().getDistancia();
-                            parcial.agregarArista(x, y, w);
-                        });
+                Set<Vertice> visitados = new HashSet<>();
 
-                        SwingUtilities.invokeLater(() -> repaintSubGrafo(parcial));
-                        Thread.sleep(800);
+                for (Arista a : todasAristas) {
+                   
+                    if (!visitados.contains(a.getOrigen())) {
+                        graph.getNode(a.getOrigen().getNombre()).setAttribute("ui.class", "gris");
+                        visitados.add(a.getOrigen());
+                    }
+                    if (!visitados.contains(a.getDestino())) {
+                        graph.getNode(a.getDestino().getNombre()).setAttribute("ui.class", "gris");
+                        visitados.add(a.getDestino());
                     }
 
+                 
+                    String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
+                    String id2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
+                    Edge e = graph.getEdge(id1);
+                    if (e == null) {
+                        e = graph.getEdge(id2);
+                    }
+                    if (e == null) {
+                        e = graph.addEdge(id1,
+                                a.getOrigen().getNombre(),
+                                a.getDestino().getNombre(),
+                                false);
+                    }
+
+                    e.setAttribute("ui.class", "highlighted");
+                    e.setAttribute("ui.label", a.getDistancia());
+
+                    Thread.sleep(1200);
                 }
-                StringBuilder sb = new StringBuilder("Rutas más cortas desde " + origenNombre + ":\n");
-                List<Vertice> todos = new ArrayList<>(base.obtenerVertices());
-                todos.sort(Comparator.comparing(Vertice::getNombre));
-                for (Vertice destino : todos) {
+
+                for (Vertice v : visitados) {
+                    graph.getNode(v.getNombre()).setAttribute("ui.class", "negro");
+                }
+
+                
+                StringBuilder sb = new StringBuilder("Caminos mínimos desde " + origenNombre + ":\n");
+                List<Vertice> vs = new ArrayList<>(base.obtenerVertices());
+                vs.sort(Comparator.comparing(Vertice::getNombre));
+
+                for (Vertice destino : vs) {
                     if (destino.equals(origen)) {
                         continue;
                     }
-
-                    List<Vertice> sec = new ArrayList<>();
-                    Vertice paso = destino;
-                    while (paso != null) {
-                        sec.add(0, paso);
-                        paso = res.previos.get(paso);
+                    List<String> pasos = new ArrayList<>();
+                    Vertice v = destino;
+                    while (v != null) {
+                        pasos.add(0, v.getNombre() + " (" + (int) Math.round(distAcum.get(v)) + ")");
+                        v = res.previos.get(v);
                     }
-                    List<String> partes = sec.stream()
-                            .map(v -> v.getNombre() + " (" + (int) Math.round(res.distancias.get(v)) + ")")
-                            .collect(Collectors.toList());
-
-                    sb.append("- ").append(String.join(" → ", partes)).append("\n");
+                    sb.append("• ").append(String.join(" → ", pasos)).append("\n");
                 }
 
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(this,
-                            sb.toString(),
-                            "Caminos más cortos desde " + origenNombre,
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                });
-            } catch (InterruptedException ignore) {
-                Thread.currentThread().interrupt();
+                SwingUtilities.invokeLater(()
+                        -> JOptionPane.showMessageDialog(this,
+                                sb.toString(),
+                                "Bellman–Ford — todas",
+                                JOptionPane.INFORMATION_MESSAGE)
+                );
+
+            } catch (Exception ex) {
+                SwingUtilities.invokeLater(()
+                        -> JOptionPane.showMessageDialog(this,
+                                ex.getMessage(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE)
+                );
             }
         }).start();
-    }
-
-    private Vertice findVertice(GrafoTDA g, String nombre) {
-        return g.obtenerVertices().stream()
-                .filter(v -> v.getNombre().equals(nombre))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException(nombre));
-    }
-
-    private void repaintSubGrafo(GrafoTDA sub) {
-        removeCurrentGrafoPanel();
-        add(PanelGrafo.obtenerGrafoPintado(sub), BorderLayout.CENTER);
-        revalidate();
-        repaint();
     }
 
 }

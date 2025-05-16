@@ -5,6 +5,7 @@ import Implementacion.ColorVertice;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Implementación de DFS (Depth‑First Search) para grafos representados con
@@ -42,22 +43,45 @@ public final class DFS {
      * DFS.
      * @throws java.lang.InterruptedException
      */
-    public static Resultado ejecutar(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
+    public static Resultado ejecutarDFS(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
         Map<Vertice, ColorVertice> color = new HashMap<>();
+        List<Vertice> orden = new ArrayList<>();
+        Map<Vertice, List<Arista>> arbol = new HashMap<>();
+
         for (Vertice v : grafo.obtenerVertices()) {
             color.put(v, ColorVertice.BLANCO);
-        }
-
-        List<Vertice> ordenDescubrimiento = new ArrayList<>();
-
-        Map<Vertice, List<Arista>> arbol = new HashMap<>();
-        for (Vertice v : grafo.obtenerVertices()) {
             arbol.put(v, new ArrayList<>());
         }
 
-        dfsVisitar(grafo, semilla, color, ordenDescubrimiento, arbol);
+        // Visita recursiva
+        Consumer<Vertice> dfsVisit = new Consumer<>() {
+            @Override
+            public void accept(Vertice u) {
+                color.put(u, ColorVertice.GRIS);
+                orden.add(u);
+                for (Arista a : grafo.obtenerAdyacentes(u)) {
+                    Vertice v = a.getDestino();
+                    if (color.get(v) == ColorVertice.BLANCO) {
+                        arbol.get(u).add(new Arista(u, v, a.getDistancia()));
+                        arbol.get(v).add(new Arista(v, u, a.getDistancia()));
+                        accept(v);  // recursión
+                    }
+                }
+                color.put(u, ColorVertice.NEGRO);
+            }
+        };
 
-        return new Resultado(ordenDescubrimiento, arbol);
+        // Primer componente
+        dfsVisit.accept(semilla);
+
+        // Cualquier otro vértice desconectado
+        for (Vertice v : grafo.obtenerVertices()) {
+            if (color.get(v) == ColorVertice.BLANCO) {
+                dfsVisit.accept(v);
+            }
+        }
+
+        return new Resultado(orden, arbol);
     }
 
     /**
@@ -69,7 +93,7 @@ public final class DFS {
      * @throws java.lang.InterruptedException
      */
     public static List<Vertice> recorridoOrden(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        Resultado res = ejecutar(grafo, semilla);
+        Resultado res = ejecutarDFS(grafo, semilla);
         return res.orden;
     }
 
@@ -82,10 +106,9 @@ public final class DFS {
      * @throws java.lang.InterruptedException
      */
     public static Map<Vertice, List<Arista>> obtenerArbol(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        Resultado res = ejecutar(grafo, semilla);
+        Resultado res = ejecutarDFS(grafo, semilla);
         return res.arbol;
     }
-    
 
     private static void dfsVisitar(
             GrafoTDA grafo,
@@ -98,7 +121,6 @@ public final class DFS {
 
 //        System.out.println("Entrando en DFS: " + u.getNombre());
 //        Thread.sleep(500);
-
         orden.add(u);
 
         for (Arista a : grafo.obtenerAdyacentes(u)) {
@@ -108,7 +130,6 @@ public final class DFS {
 //                System.out.println("  Arista de árbol DFS: "
 //                        + u.getNombre() + " → " + v.getNombre());
 //                Thread.sleep(500);
-
                 arbol.get(u).add(new Arista(u, v, a.getDistancia()));
                 arbol.get(v).add(new Arista(v, u, a.getDistancia()));
                 dfsVisitar(grafo, v, color, orden, arbol);

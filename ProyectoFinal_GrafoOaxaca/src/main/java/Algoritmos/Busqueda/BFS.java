@@ -5,6 +5,7 @@ import Implementacion.ColorVertice;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * Implementación de BFS (Breadth‑First Search) para grafos no dirigidos
@@ -43,54 +44,54 @@ public final class BFS {
      * Ejecuta BFS desde la ciudad semilla.
      *
      * @param grafo La estructura de datos GrafoTDA.
-     * @param semilla Vértice de partida.
+     * @param semillaInicial
      * @return Un objeto Resultado con la secuencia de visita, árbol BFS y
      * niveles.
-     * @throws java.lang.InterruptedException
      */
-    public static Resultado ejecutar(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
+    public static Resultado ejecutarBFS(GrafoTDA grafo, Vertice semillaInicial) {
         Map<Vertice, ColorVertice> color = new HashMap<>();
         Map<Vertice, Integer> nivel = new HashMap<>();
+        Map<Vertice, List<Arista>> arbol = new HashMap<>();
         List<Vertice> orden = new ArrayList<>();
 
-        Map<Vertice, List<Arista>> arbol = new HashMap<>();
         for (Vertice v : grafo.obtenerVertices()) {
             color.put(v, ColorVertice.BLANCO);
             nivel.put(v, Integer.MAX_VALUE);
             arbol.put(v, new ArrayList<>());
         }
 
-        Queue<Vertice> cola = new LinkedList<>();
-        color.put(semilla, ColorVertice.GRIS);
-        nivel.put(semilla, 0);
-        cola.add(semilla);
-        orden.add(semilla);
+        // Método auxiliar que arranca un BFS **con su propia cola**
+        BiConsumer<Vertice, Boolean> bfsDesde = (semilla, primeraVez) -> {
+            Queue<Vertice> cola = new LinkedList<>();
+            color.put(semilla, ColorVertice.GRIS);
+            nivel.put(semilla, 0);
+            cola.add(semilla);
+            orden.add(semilla);
 
-        while (!cola.isEmpty()) {
-            Vertice u = cola.poll();
-//            System.out.println("Procesando vértice: " + u.getNombre());
-//            Thread.sleep(500);
-            int nl = nivel.get(u);
-            for (Arista a : grafo.obtenerAdyacentes(u)) {
-                Vertice v = a.getDestino();
-                if (color.get(v) == ColorVertice.BLANCO) {
-                    System.out.println(" → Descubriendo vértice: " + v.getNombre()
-                            + " desde " + u.getNombre()
-                            + " (nivel " + (nl + 1) + ")");
-
-                    color.put(v, ColorVertice.GRIS);
-                    nivel.put(v, nl + 1);
-                    cola.add(v);
-
-                    orden.add(v);
-
-                    arbol.get(u).add(new Arista(u, v, a.getDistancia()));
-                    arbol.get(v).add(new Arista(v, u, a.getDistancia()));
+            while (!cola.isEmpty()) {
+                Vertice u = cola.poll();
+                for (Arista a : grafo.obtenerAdyacentes(u)) {
+                    Vertice v = a.getDestino();
+                    if (color.get(v) == ColorVertice.BLANCO) {
+                        color.put(v, ColorVertice.GRIS);
+                        nivel.put(v, nivel.get(u) + 1);
+                        cola.add(v);
+                        orden.add(v);
+                        arbol.get(u).add(new Arista(u, v, a.getDistancia()));
+                        arbol.get(v).add(new Arista(v, u, a.getDistancia()));
+                    }
                 }
+                color.put(u, ColorVertice.NEGRO);
             }
-            color.put(u, ColorVertice.NEGRO);
-//            System.out.println("Terminando vértice: " + u.getNombre());
-//            Thread.sleep(300);
+        };
+
+        bfsDesde.accept(semillaInicial, true);
+
+        // 2) Si hay vértices aún blancos, arrancarles su propio BFS
+        for (Vertice v : grafo.obtenerVertices()) {
+            if (color.get(v) == ColorVertice.BLANCO) {
+                bfsDesde.accept(v, false);
+            }
         }
 
         return new Resultado(orden, arbol, nivel);
@@ -105,7 +106,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static List<Vertice> recorrido(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        return ejecutar(grafo, semilla).orden;
+        return ejecutarBFS(grafo, semilla).orden;
     }
 
     /**
@@ -117,7 +118,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static Map<Vertice, List<Arista>> obtenerArbol(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        return ejecutar(grafo, semilla).arbol;
+        return ejecutarBFS(grafo, semilla).arbol;
     }
 
     /**
@@ -130,7 +131,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static Map<Vertice, Integer> obtenerNiveles(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        return ejecutar(grafo, semilla).nivel;
+        return ejecutarBFS(grafo, semilla).nivel;
     }
 
     /**
@@ -143,7 +144,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static Map<Integer, List<Vertice>> agruparPorNivel(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        Resultado res = ejecutar(grafo, semilla);
+        Resultado res = ejecutarBFS(grafo, semilla);
         Map<Integer, List<Vertice>> grupos = new LinkedHashMap<>();
         for (Vertice v : res.orden) {
             int nl = res.nivel.get(v);

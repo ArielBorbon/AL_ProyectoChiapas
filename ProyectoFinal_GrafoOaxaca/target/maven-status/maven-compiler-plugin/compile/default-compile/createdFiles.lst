@@ -30,6 +30,7 @@ GUI\ModalRutaMasCorta.class
 GUI\ModalSeleccionarFuente$1.class
 GUI\PanelDefault.class
 Algoritmos\Busqueda\DFS$Resultado.class
+Algoritmos\Busqueda\DFS$1.class
 Algoritmos\RutaMasCorta\BellmanFord$Resultado.class
 Algoritmos\MST\BoruvkaListener.class
 GUI\Estilos.class

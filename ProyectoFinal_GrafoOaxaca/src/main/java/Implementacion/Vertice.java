@@ -58,21 +58,23 @@ public class Vertice {
         this.llave = llave;
     }
 
+
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (!(o instanceof Vertice)) {
             return false;
         }
-        Vertice vertice = (Vertice) obj;
-        return Objects.equals(nombre, vertice.nombre);
+        Vertice v = (Vertice) o;
+        return nombre.equals(v.nombre);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nombre);
+        return nombre.hashCode();
     }
 
 }
