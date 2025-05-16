@@ -12,6 +12,7 @@ import org.graphstream.ui.swing_viewer.ViewPanel;
 import Implementacion.Arista;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
+import java.awt.Dimension;
 
 public class PanelGrafo {
 
@@ -34,7 +35,6 @@ public class PanelGrafo {
     public static JPanel obtenerGrafoPintado(GrafoTDA grafoPintado) {
         Graph grafoChiapasVisual = crearGrafoChiapas();
 
-        // Agregar aristas al grafo visual
         for (Vertice ciudad : grafoPintado.obtenerVertices()) {
             for (Arista arista : grafoPintado.obtenerAdyacentes(ciudad)) {
                 String origen = arista.getOrigen().getNombre();
@@ -54,21 +54,18 @@ public class PanelGrafo {
 
         return createPanelGrafo(grafoChiapasVisual);
     }
-    
 
     public static JPanel createPanelGrafo(Graph grafo) {
-        // Crear y devolver el panel de visualizació
         SwingViewer viewer = new SwingViewer(grafo, SwingViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.disableAutoLayout();
         ViewPanel viewPanel = (ViewPanel) viewer.addDefaultView(false);
         return viewPanel;
     }
 
-    private static Graph crearGrafoChiapas() {
+    static Graph crearGrafoChiapas() {
         System.setProperty("org.graphstream.ui", "swing");
         Graph grafo = new SingleGraph("Grafo Chiapas");
-        int[][] coordenadas = grafoChiapas.getCoordenadas(); // Coordenadas de las ciudades
-        // Agregar nodos (vértices) al grafo visual
+        int[][] coordenadas = grafoChiapas.getCoordenadas(); 
         for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
             Node vertice = grafo.addNode(ciudad.getNombre());
             vertice.setAttribute("ui.label", ciudad.getNombre());
@@ -76,7 +73,6 @@ public class PanelGrafo {
             vertice.setAttribute("xy", coordenadas[indice][0], coordenadas[indice][1]);
         }
 
-        // Agregar aristas al grafo visual
         for (Vertice ciudad : grafoChiapas.getGrafo().obtenerVertices()) {
             for (Arista arista : grafoChiapas.getGrafo().obtenerAdyacentes(ciudad)) {
                 String origen = arista.getOrigen().getNombre();
@@ -88,26 +84,49 @@ public class PanelGrafo {
             }
         }
 
-        // Aplicar estilos al grafo
         grafo.setAttribute("ui.stylesheet", """
-                node {
-                    text-size: 14px;
-                    fill-color: rgb(134,192,160);
-                    size: 40px;
-                    text-alignment: center;
-                }
-                edge {
-                    text-size: 14px;
-                    fill-color: rgb(130,130,130);
-                    size: 3px;
+        node {
+          fill-color: rgb(134,192,160); /* color base */
+          size: 30px;
+          text-alignment: center;
+          text-size: 12px;
+        }
+        node.gris {
+          fill-color: orange;   /* descubierto, aún no procesado */
+        }
+        node.negro {
+          fill-color: gray;     /* procesado */
+        }
+        edge {
+          fill-color: rgb(130,130,130);
+          text-size: 10px;
+        }
+        edge.highlighted {
+          fill-color: red;
+          size: 3px;
+        }
+    """);
 
-                }
-                edge.highlighted {
-                    fill-color: rgb(255,160,122);
-
-                }
-                """);
         return grafo;
+    }
+
+    public static JPanel createPanelGrafo(Graph grafo, boolean autoLayout) {
+       
+        SwingViewer viewer = new SwingViewer(grafo,
+                SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD
+        );
+        if (autoLayout) {
+            viewer.enableAutoLayout();
+        } else {
+            viewer.disableAutoLayout();
+        }
+
+        ViewPanel viewPanel = (ViewPanel) viewer.addDefaultView(false);
+
+        viewPanel.setPreferredSize(new Dimension(800, 600));
+        viewPanel.setMinimumSize(new Dimension(400, 300));
+
+        return viewPanel;
     }
 
 }

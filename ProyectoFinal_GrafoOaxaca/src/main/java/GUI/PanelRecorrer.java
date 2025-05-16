@@ -5,11 +5,21 @@ import Algoritmos.Busqueda.DFS;
 import Implementacion.Arista;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 import javax.swing.*;
-import java.awt.*;
+import java.util.List;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.swing_viewer.SwingViewer;
+import org.graphstream.ui.swing_viewer.ViewPanel;
 
 public class PanelRecorrer extends JPanel {
 
@@ -115,60 +125,100 @@ public class PanelRecorrer extends JPanel {
     private void pintarRecorridoBFS(String semillaNombre) {
         new Thread(() -> {
             try {
+                int c1 = 1;
                 GrafoTDA base = new GrafoChiapas().getGrafo();
+
                 Vertice semilla = base.obtenerVertices().stream()
                         .filter(v -> v.getNombre().equals(semillaNombre))
-                        .findFirst()
-                        .orElseThrow();
+                        .findFirst().orElseThrow();
 
                 BFS.Resultado res = BFS.ejecutar(base, semilla);
 
-                GrafoTDA sub = new GrafoTDA();
-                base.obtenerVertices().stream()
-                        .sorted(Comparator.comparing(Vertice::getNombre))
-                        .forEach(sub::agregarVertice);
+                System.setProperty("org.graphstream.ui", "swing");
+                Graph graph = PanelGrafo.crearGrafoChiapas();
+                graph.setAttribute("ui.stylesheet", """
+    node {
+       fill-color: rgb(134,192,160);
+          size: 30px;
+          text-alignment: center; text-size: 12px;
+        }
+        node.gris { fill-color: orange; }
+        node.negro { fill-color: gray; }
+        edge { fill-color: rgb(130,130,130); text-size: 10px; }
+        edge.highlighted { fill-color: red; size: 3px; }
+    """);
+
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+                viewer.disableAutoLayout();
+                ViewPanel view = (ViewPanel) viewer.addDefaultView(false);
+
+                SwingUtilities.invokeLater(() -> {
+                    removeCurrentGrafoPanel();
+                    add(view, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                });
 
                 for (int i = 1; i < res.orden.size(); i++) {
                     Vertice v = res.orden.get(i);
 
                     Vertice padre = null;
                     double peso = 0;
-                    for (Vertice u : res.arbol.keySet()) {
-                        for (Arista a : res.arbol.get(u)) {
+                    for (var entry : res.arbol.entrySet()) {
+                        for (Arista a : entry.getValue()) {
                             if (a.getDestino().equals(v)) {
-                                padre = u;
+                                padre = entry.getKey();
                                 peso = a.getDistancia();
+                                break;
                             }
                         }
+                        if (padre != null) {
+                            break;
+                        }
                     }
-                    if (padre != null) {
-                        sub.agregarArista(padre, v, peso);
+                    if (padre == null) {
+                        continue;
                     }
 
-                    SwingUtilities.invokeLater(() -> {
-                        removeCurrentGrafoPanel();
-                        add(PanelGrafo.obtenerGrafoPintado(sub), BorderLayout.CENTER);
-                        revalidate();
-                        repaint();
-                    });
+                    Node nodoV = graph.getNode(v.getNombre());
+                    nodoV.setAttribute("ui.class", "gris");
+
+                    String id1 = padre.getNombre() + "-" + v.getNombre();
+                    String id2 = v.getNombre() + "-" + padre.getNombre();
+                    Edge e = graph.getEdge(id1);
+                    if (e == null) {
+                        e = graph.getEdge(id2);
+                    }
+                    if (e != null) {
+                        e.setAttribute("ui.class", "highlighted");
+                        e.setAttribute("ui.label", peso);
+                    }
+
                     Thread.sleep(500);
+
+                    c1++;
+
+                    Vertice anterior = res.orden.get(i - 1);
+                    graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
                 }
 
+                Vertice anterior = res.orden.get(c1 - 1);
+                graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+
+                graph.getNode(semillaNombre).setAttribute("ui.class", "negro");
+
                 StringBuilder sb = new StringBuilder();
-                sb.append("BFS desde ").append(semillaNombre).append("\n\n");
-                sb.append("Orden de descubrimiento:\n")
+                sb.append("BFS desde ").append(semillaNombre).append("\n\n")
+                        .append("Orden de descubrimiento:\n")
                         .append(res.orden.stream()
                                 .map(Vertice::getNombre)
                                 .collect(Collectors.joining(" → ")))
                         .append("\n\nNiveles:\n");
                 res.nivel.entrySet().stream()
                         .sorted(Comparator.comparing(e -> e.getKey().getNombre()))
-                        .forEach(e
-                                -> sb.append(e.getKey().getNombre())
-                                .append(": ")
-                                .append(e.getValue())
-                                .append("\n")
-                        );
+                        .forEach(en -> sb.append(en.getKey().getNombre())
+                        .append(": ").append(en.getValue())
+                        .append("\n"));
 
                 SwingUtilities.invokeLater(()
                         -> JOptionPane.showMessageDialog(this,
@@ -177,6 +227,7 @@ public class PanelRecorrer extends JPanel {
                                 JOptionPane.INFORMATION_MESSAGE
                         )
                 );
+                graph.getNode(semillaNombre).setAttribute("ui.class", "negro");
 
             } catch (InterruptedException | NoSuchElementException ex) {
                 SwingUtilities.invokeLater(()
@@ -194,49 +245,96 @@ public class PanelRecorrer extends JPanel {
         new Thread(() -> {
             try {
                 GrafoTDA base = new GrafoChiapas().getGrafo();
+                int c1 = 1;
                 Vertice semilla = base.obtenerVertices().stream()
                         .filter(v -> v.getNombre().equals(semillaNombre))
-                        .findFirst()
-                        .orElseThrow();
+                        .findFirst().orElseThrow();
 
                 DFS.Resultado res = DFS.ejecutar(base, semilla);
 
-                GrafoTDA sub = new GrafoTDA();
-                base.obtenerVertices().stream()
-                        .sorted(Comparator.comparing(Vertice::getNombre))
-                        .forEach(sub::agregarVertice);
+                System.setProperty("org.graphstream.ui", "swing");
+                Graph graph = PanelGrafo.crearGrafoChiapas();
+                graph.setAttribute("ui.stylesheet", """
+                node {
+                  fill-color: rgb(134,192,160);
+                  size: 30px;
+                  text-alignment: center;
+                  text-size: 12px;
+                }
+                node.gris { fill-color: orange; }
+                node.negro { fill-color: gray; }
+                edge {
+                  fill-color: rgb(130,130,130);
+                  text-size: 10px;
+                }
+                edge.highlighted {
+                  fill-color: red;
+                  size: 3px;
+                }
+            """);
+
+                SwingViewer viewer = new SwingViewer(graph,
+                        SwingViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+                viewer.disableAutoLayout();
+                ViewPanel view = (ViewPanel) viewer.addDefaultView(false);
+
+                SwingUtilities.invokeLater(() -> {
+                    removeCurrentGrafoPanel();
+                    add(view, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                });
 
                 for (int i = 1; i < res.orden.size(); i++) {
                     Vertice v = res.orden.get(i);
+
                     Vertice padre = null;
                     double peso = 0;
-                    for (Vertice u : res.arbol.keySet()) {
-                        for (Arista a : res.arbol.get(u)) {
+                    for (Map.Entry<Vertice, List<Arista>> entry : res.arbol.entrySet()) {
+                        for (Arista a : entry.getValue()) {
                             if (a.getDestino().equals(v)) {
-                                padre = u;
+                                padre = entry.getKey();
                                 peso = a.getDistancia();
+                                break;
                             }
                         }
+                        if (padre != null) {
+                            break;
+                        }
                     }
-                    if (padre != null) {
-                        sub.agregarArista(padre, v, peso);
+                    if (padre == null) {
+                        continue;
                     }
 
-                    SwingUtilities.invokeLater(() -> {
-                        removeCurrentGrafoPanel();
-                        add(PanelGrafo.obtenerGrafoPintado(sub), BorderLayout.CENTER);
-                        revalidate();
-                        repaint();
-                    });
+                    graph.getNode(v.getNombre()).setAttribute("ui.class", "gris");
+
+                    String id1 = padre.getNombre() + "-" + v.getNombre();
+                    String id2 = v.getNombre() + "-" + padre.getNombre();
+                    Edge e = graph.getEdge(id1);
+                    if (e == null) {
+                        e = graph.getEdge(id2);
+                    }
+                    if (e != null) {
+                        e.setAttribute("ui.class", "highlighted");
+                    }
+
                     Thread.sleep(500);
+
+                    Vertice anterior = res.orden.get(i - 1);
+                    graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+                    c1++;
                 }
+
+                Vertice anterior = res.orden.get(c1 - 1);
+                graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+
+                graph.getNode(semillaNombre).setAttribute("ui.class", "negro");
 
                 String resultado = "DFS desde " + semillaNombre + "\n\n"
                         + "Orden de descubrimiento:\n"
                         + res.orden.stream()
                                 .map(Vertice::getNombre)
                                 .collect(Collectors.joining(" → "));
-
                 SwingUtilities.invokeLater(()
                         -> JOptionPane.showMessageDialog(this,
                                 resultado,

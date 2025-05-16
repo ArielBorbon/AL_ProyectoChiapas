@@ -1,33 +1,33 @@
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\Busqueda\BFS.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\Busqueda\DFS.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\Boruvka.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\BoruvkaListener.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\Kruskal.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\Prim.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\UnionFind.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\RutaMasCorta\BellmanFord.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\RutaMasCorta\Dijkstra.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\Estilos.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\GrafoChiapas.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\MenuPrincipal.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\ModalRutaMasCorta.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\ModalSeleccionarFuente.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelDefault.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesMST\PanelBoruvka.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesMST\PanelKruskal.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesMST\PanelPrim.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRecorrer\PanelBFS.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRecorrer\PanelDFS.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRutaCorta\PanelBellmanFord.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRutaCorta\PanelDijkstra.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelGrafo.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelMST.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelRecorrer.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelReportes.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelRutaMasCorta.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelVisualizar.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\Arista.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\ColorVertice.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\GrafoTDA.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\Main.java
-C:\Users\rayoa\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\Vertice.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesMST\PanelKruskal.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesMST\PanelPrim.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\BoruvkaListener.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelReportes.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\Busqueda\BFS.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\Busqueda\DFS.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\Kruskal.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\Boruvka.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\RutaMasCorta\BellmanFord.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\UnionFind.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\Main.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\Arista.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\GrafoTDA.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelGrafo.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelVisualizar.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRecorrer\PanelBFS.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelRecorrer.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelRutaMasCorta.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelMST.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\Vertice.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRecorrer\PanelDFS.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\ModalRutaMasCorta.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Implementacion\ColorVertice.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\MenuPrincipal.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesMST\PanelBoruvka.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelDefault.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRutaCorta\PanelBellmanFord.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\MST\Prim.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\PanelesRutaCorta\PanelDijkstra.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\Algoritmos\RutaMasCorta\Dijkstra.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\Estilos.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\GrafoChiapas.java
+C:\Users\PC Gamer\OneDrive\Documents\GitHub\AL_ProyectoChiapas\ProyectoFinal_GrafoOaxaca\src\main\java\GUI\ModalSeleccionarFuente.java
