@@ -1,11 +1,18 @@
 package Algoritmos.Busqueda;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.function.BiConsumer;
+
 import Implementacion.Arista;
 import Implementacion.ColorVertice;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
-import java.util.*;
-import java.util.function.BiConsumer;
 
 /**
  * Implementación de BFS (Breadth‑First Search) para grafos no dirigidos
@@ -16,7 +23,16 @@ import java.util.function.BiConsumer;
  */
 public final class BFS {
 
+    private static BFSListener listener;
+
     private BFS() {
+    }
+
+    /**
+     * Registrar un listener para notificación de nuevas aristas durante el recorrido.
+     */
+    public static void setListener(BFSListener l) {
+        listener = l;
     }
 
     /**
@@ -77,8 +93,20 @@ public final class BFS {
                         nivel.put(v, nivel.get(u) + 1);
                         cola.add(v);
                         orden.add(v);
-                        arbol.get(u).add(new Arista(u, v, a.getDistancia()));
+
+                        Arista nueva = new Arista(u, v, a.getDistancia());
+                        arbol.get(u).add(nueva);
                         arbol.get(v).add(new Arista(v, u, a.getDistancia()));
+
+                        // Notificar al listener y pausar para animación
+                        if (listener != null) {
+                            listener.onNuevaArista(nueva);
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                            }
+                        }
                     }
                 }
                 color.put(u, ColorVertice.NEGRO);
