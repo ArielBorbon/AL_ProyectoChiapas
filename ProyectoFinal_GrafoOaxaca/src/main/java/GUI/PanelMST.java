@@ -3,6 +3,7 @@ package GUI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,8 +11,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import Algoritmos.MST.Boruvka;
+import Algoritmos.MST.BoruvkaListener;
 import Algoritmos.MST.Kruskal;
 import Algoritmos.MST.Prim;
+import Implementacion.Arista;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
 
@@ -20,46 +23,32 @@ public class PanelMST extends JPanel {
     public PanelMST() {
         initComponents();
         mostrarGrafoOriginal();
-
     }
 
     private void initComponents() {
-        // Configuracion basica del panel
         setLayout(new BorderLayout());
-        // botones
+
         JButton btnKruskal = Estilos.crearBoton("Usar algoritmo de Kruskal");
         JButton btnPrim = Estilos.crearBoton("Usar algoritmo de Prim");
         JButton btnBoruvka = Estilos.crearBoton("Usar algoritmo de Boruvka");
         JButton btnVolver = Estilos.crearBoton("Volver");
-        // panel de botones
+
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new GridLayout(1, 4, 10, 10));
-        // agregar botones al panel
-        panelBotones.add(btnKruskal, BorderLayout.CENTER);
-        panelBotones.add(btnPrim, BorderLayout.CENTER);
-        panelBotones.add(btnBoruvka, BorderLayout.CENTER);
-        panelBotones.add(btnVolver, BorderLayout.CENTER);
-        // agregar panel
+
+        panelBotones.add(btnKruskal);
+        panelBotones.add(btnPrim);
+        panelBotones.add(btnBoruvka);
+        panelBotones.add(btnVolver);
+
         add(panelBotones, BorderLayout.SOUTH);
 
-        // metodo para salir
         btnVolver.addActionListener(e -> {
-            // Obtener el JFrame (ventana) que contiene este panel
             JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-            if (ventana instanceof MenuPrincipal) {
-                MenuPrincipal menu = (MenuPrincipal) ventana;
-
-                // Limpiar todo lo que hay actualmente en la ventana
+            if (ventana instanceof MenuPrincipal menu) {
                 menu.getContentPane().removeAll();
-
-                // Volver a agregar el panel del menú lateral
                 menu.add(menu.getPanelMenuLateral(), BorderLayout.WEST);
-
-                // Agregar algún panel de inicio o bienvenida, si lo usas
                 menu.add(new PanelDefault(), BorderLayout.CENTER);
-
-                // Actualizar la interfaz gráfica
                 menu.revalidate();
                 menu.repaint();
             }
@@ -71,10 +60,9 @@ public class PanelMST extends JPanel {
             JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
             ModalSeleccionarFuente modal = new ModalSeleccionarFuente(ventana, true, ModalSeleccionarFuente.FUENTE);
             modal.mostrar();
-            Vertice fuente = new Vertice(modal.getCiudadOrigen()); 
+            Vertice fuente = new Vertice(modal.getCiudadOrigen());
             pintarMSTPrim(fuente);
         });
-
     }
 
     private void pintarMSTKruskal() {
@@ -110,19 +98,21 @@ public class PanelMST extends JPanel {
     }
 
     private void pintarMSTBoruvka() {
-        new Thread(() -> {
-            try {
-                Boruvka boruvka = new Boruvka(new GrafoChiapas().getGrafo());
-                boruvka.start(); // iniciar el hilo
-                while (boruvka.isAlive()) {
-                    Thread.sleep(1000); // tiempo para visualizar iteraciones si quieres mostrar progreso
-                    GrafoTDA mst = boruvka.getMST();
-                    SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        Boruvka boruvka = new Boruvka(new GrafoChiapas().getGrafo());
+
+        boruvka.setListener(new BoruvkaListener() {
+            @Override
+            public void onSeleccionAristas(Collection<Arista> seleccionadas) {
+                // Opcional: destacar visualmente las aristas seleccionadas antes de agregarlas
             }
-        }).start();
+
+            @Override
+            public void onActualizaMST(GrafoTDA mstActual) {
+                SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mstActual));
+            }
+        });
+
+        boruvka.start(); // iniciar el algoritmo en un hilo propio
     }
 
     private void mostrarGrafoPintado(GrafoTDA grafoPintado) {
@@ -136,16 +126,13 @@ public class PanelMST extends JPanel {
     }
 
     private void mostrarGrafo(JPanel panelGrafo) {
-
         Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (panelCentral != null) {
             remove(panelCentral);
         }
 
         add(panelGrafo, BorderLayout.CENTER);
-
         revalidate();
         repaint();
     }
-
 }

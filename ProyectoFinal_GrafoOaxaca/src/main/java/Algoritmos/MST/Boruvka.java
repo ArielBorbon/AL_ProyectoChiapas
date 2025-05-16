@@ -14,6 +14,12 @@ public class Boruvka extends Thread {
     private GrafoTDA grafo;
     private GrafoTDA mst = new GrafoTDA();
 
+    private BoruvkaListener listener;
+
+    public void setListener(BoruvkaListener listener) {
+        this.listener = listener;
+    }
+
     public Boruvka(GrafoTDA grafo) {
         this.grafo = grafo;
     }
@@ -33,11 +39,8 @@ public class Boruvka extends Thread {
 
             UnionFind uf = new UnionFind(verticesOriginales);
             int componentes = verticesOriginales.size();
-            int iteracion = 0;
 
             while (componentes > 1 && ejecutando) {
-                iteracion++;
-
                 // Obtener representantes únicos actuales (componentes)
                 Set<Vertice> componentesActuales = new HashSet<>();
                 for (Vertice v : verticesOriginales) {
@@ -52,9 +55,6 @@ public class Boruvka extends Thread {
                     double minDistancia = Double.MAX_VALUE;
                     Arista aristaMin = null;
 
-                    // Para encontrar las aristas que salen del componente 'comp'
-                    // hay que revisar todos los vértices del grafo, y para
-                    // cada uno que pertenezca a este componente, revisar sus adyacentes
                     for (Vertice v : verticesOriginales) {
                         if (uf.find(v).equals(comp)) {
                             for (Arista arista : grafo.obtenerAdyacentes(v)) {
@@ -75,6 +75,7 @@ public class Boruvka extends Thread {
                             }
                         }
                     }
+
                     if (aristaMin != null) {
                         mejorAristaPorComponente.put(comp, aristaMin);
                         aristasConsideradas.add(generarClave(aristaMin.getOrigen(), aristaMin.getDestino()));
@@ -83,7 +84,6 @@ public class Boruvka extends Thread {
 
                 int uniones = 0;
 
-                // Unir componentes con las aristas seleccionadas
                 for (Arista arista : mejorAristaPorComponente.values()) {
                     Vertice u = arista.getOrigen();
                     Vertice w = arista.getDestino();
@@ -100,12 +100,13 @@ public class Boruvka extends Thread {
                     }
                 }
 
-                if (uniones == 0) break;
-
-                // Visualización pausada solo después de la primera y última iteración
-                if (iteracion == 1 || componentes == 1) {
+                // ✅ Notificar al listener y pausar después de cada iteración
+                if (listener != null) {
+                    listener.onActualizaMST(mst);
                     Thread.sleep(1000);
                 }
+
+                if (uniones == 0) break;
             }
         } catch (InterruptedException e) {
             System.out.println("Algoritmo Boruvka interrumpido");
