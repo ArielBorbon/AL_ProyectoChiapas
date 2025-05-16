@@ -51,10 +51,26 @@ public class PanelGrafo {
 
             }
         }
+        // Pintar aristas marcadas por el atributo 'anterior' de cada vértice
+        for (Vertice v : grafoPintado.obtenerVertices()) {
+            Vertice anterior = v.getAnterior();
+            if (anterior != null) {
+                String origen = v.getNombre();
+                String destino = anterior.getNombre();
+                Edge carretera = grafoChiapasVisual.getEdge(origen + "-" + destino);
+                if (carretera != null) {
+                    carretera.setAttribute("ui.class", "highlighted");
+                } else {
+                    Edge altCarretera = grafoChiapasVisual.getEdge(destino + "-" + origen);
+                    if (altCarretera != null) {
+                        altCarretera.setAttribute("ui.class", "highlighted");
+                    }
+                }
+            }
+        }
 
         return createPanelGrafo(grafoChiapasVisual);
     }
-    
 
     public static JPanel createPanelGrafo(Graph grafo) {
         // Crear y devolver el panel de visualizació

@@ -11,7 +11,9 @@ import javax.swing.SwingUtilities;
 
 import Algoritmos.MST.Boruvka;
 import Algoritmos.MST.Kruskal;
+import Algoritmos.MST.Prim;
 import Implementacion.GrafoTDA;
+import Implementacion.Vertice;
 
 public class PanelMST extends JPanel {
 
@@ -63,13 +65,15 @@ public class PanelMST extends JPanel {
             }
         });
 
-        btnKruskal.addActionListener(e -> {
-            pintarMSTKruskal();
+        btnKruskal.addActionListener(e -> pintarMSTKruskal());
+        btnBoruvka.addActionListener(e -> pintarMSTBoruvka());
+        btnPrim.addActionListener(e -> {
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+            ModalSeleccionarFuente modal = new ModalSeleccionarFuente(ventana, true, ModalSeleccionarFuente.FUENTE);
+            modal.mostrar();
+            Vertice fuente = new Vertice(modal.getCiudadOrigen()); 
+            pintarMSTPrim(fuente);
         });
-       btnBoruvka.addActionListener(e -> pintarMSTBoruvka());
-
-
-
 
     }
 
@@ -79,7 +83,7 @@ public class PanelMST extends JPanel {
                 Kruskal kruskal = new Kruskal(new GrafoChiapas().getGrafo());
                 kruskal.start();
                 while (kruskal.isEjecutando()) {
-                    Thread.sleep(1000); 
+                    Thread.sleep(1000);
                     GrafoTDA mst = kruskal.getMst();
                     SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
                 }
@@ -88,24 +92,38 @@ public class PanelMST extends JPanel {
             }
         }).start();
     }
-   private void pintarMSTBoruvka() {
-    new Thread(() -> {
-        try {
-            Boruvka boruvka = new Boruvka(new GrafoChiapas().getGrafo());
-            boruvka.start(); // iniciar el hilo
-            while (boruvka.isAlive()) {
-                Thread.sleep(1000); // tiempo para visualizar iteraciones si quieres mostrar progreso
-                GrafoTDA mst = boruvka.getMST(); 
-                SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
+
+    private void pintarMSTPrim(Vertice fuente) {
+        new Thread(() -> {
+            try {
+                Prim prim = new Prim(new GrafoChiapas().getGrafo(), fuente);
+                prim.start();
+                while (prim.isEjecutando()) {
+                    Thread.sleep(1000);
+                    GrafoTDA mst = prim.getMST();
+                    SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }).start();
-}
+        }).start();
+    }
 
-
-
+    private void pintarMSTBoruvka() {
+        new Thread(() -> {
+            try {
+                Boruvka boruvka = new Boruvka(new GrafoChiapas().getGrafo());
+                boruvka.start(); // iniciar el hilo
+                while (boruvka.isAlive()) {
+                    Thread.sleep(1000); // tiempo para visualizar iteraciones si quieres mostrar progreso
+                    GrafoTDA mst = boruvka.getMST();
+                    SwingUtilities.invokeLater(() -> mostrarGrafoPintado(mst));
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
     private void mostrarGrafoPintado(GrafoTDA grafoPintado) {
         JPanel panelGrafo = PanelGrafo.obtenerGrafoPintado(grafoPintado);
