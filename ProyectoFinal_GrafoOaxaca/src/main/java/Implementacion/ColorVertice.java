@@ -1,6 +1,6 @@
 package Implementacion;
 
-public enum ColorVertice {
+public enum ColorVertice {          //T(3) O(1)
 
     BLANCO,
     GRIS,

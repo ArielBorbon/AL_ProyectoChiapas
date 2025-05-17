@@ -16,7 +16,7 @@ import java.util.Set;
  * @author Luna Esquer Pedro 00000252687
  * @author Preciado Guerrero Mario Alejandro 00000252940
  */
-public class GrafoTDA {
+public class GrafoTDA {                                                             //T(N) = 5n + 46        O(N)
 
     private Map<Vertice, List<Arista>> grafo;
 
@@ -24,7 +24,7 @@ public class GrafoTDA {
      * Constructor por defecto que inicializa un grafo vacío.
      */
     public GrafoTDA() {
-        this.grafo = new HashMap<>();
+        this.grafo = new HashMap<>();    //2
     }
 
     /**
@@ -34,7 +34,7 @@ public class GrafoTDA {
      * @param grafo Mapa de vértices con sus listas de adyacencias.
      */
     public GrafoTDA(Map<Vertice, List<Arista>> grafo) {
-        this.grafo = grafo;
+        this.grafo = grafo;  //1
     }
 
     /**
@@ -43,7 +43,7 @@ public class GrafoTDA {
      * @param Vertice vertice a agregar.
      */
     public void agregarVertice(Vertice vertice) {
-        grafo.putIfAbsent(vertice, new ArrayList<>());
+        grafo.putIfAbsent(vertice, new ArrayList<>());   //2
     }
 
     /**
@@ -53,16 +53,16 @@ public class GrafoTDA {
      * @param destino Identificador del vértice de destino.
      * @param distancia Peso de la arista.
      */
-   public void agregarArista(Vertice origen, Vertice destino, double distancia) {
-    Vertice realOrigen = buscarVertice(origen.getNombre());
-    Vertice realDestino = buscarVertice(destino.getNombre());
+   public void agregarArista(Vertice origen, Vertice destino, double distancia) {          //15
+    Vertice realOrigen = buscarVertice(origen.getNombre());         //3
+    Vertice realDestino = buscarVertice(destino.getNombre());        //3
 
-    if (realOrigen == null || realDestino == null) {
-        throw new IllegalArgumentException("Ambos vértices deben existir en el grafo.");
+    if (realOrigen == null || realDestino == null) {         //2
+        throw new IllegalArgumentException("Ambos vértices deben existir en el grafo.");    //1
     }
 
-    grafo.get(realOrigen).add(new Arista(realOrigen, realDestino, distancia));
-    grafo.get(realDestino).add(new Arista(realDestino, realOrigen, distancia));
+    grafo.get(realOrigen).add(new Arista(realOrigen, realDestino, distancia));  //3
+    grafo.get(realDestino).add(new Arista(realDestino, realOrigen, distancia)); //3
 }
 
 
@@ -72,16 +72,16 @@ public class GrafoTDA {
      * @param vertice Vertice a buscar.
      * @return Lista de aristas adyacentes.
      */
-    public List<Arista> obtenerAdyacentes(Vertice vertice) {
-        return grafo.get(vertice);
+    public List<Arista> obtenerAdyacentes(Vertice vertice) {            
+        return grafo.get(vertice);      //1
     }
-    private Vertice buscarVertice(String nombre) {
-    for (Vertice v : grafo.keySet()) {
+    private Vertice buscarVertice(String nombre) {          //3N + 3
+    for (Vertice v : grafo.keySet()) {      // 2n + 2
         if (v.getNombre().equals(nombre)) {
-            return v;
+            return v;   //N
         }
     }
-    return null;
+    return null;        //1
 }
 
 
@@ -91,15 +91,15 @@ public class GrafoTDA {
      * @return Conjunto de identificadores de los vértices.
      */
     public Set<Vertice> obtenerVertices() {
-        return grafo.keySet();
+        return grafo.keySet();   //1
     }
 
     public Map<Vertice, List<Arista>> getGrafo() {
-        return grafo;
+        return grafo;        //1
     }
 
     public void setGrafo(Map<Vertice, List<Arista>> grafo) {
-        this.grafo = grafo;
+        this.grafo = grafo;      //2
     }
     
     

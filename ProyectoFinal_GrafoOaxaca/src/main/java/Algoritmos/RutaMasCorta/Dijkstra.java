@@ -46,16 +46,11 @@ public final class Dijkstra {
             Vertice u = dn.getNodo();
             double du = dn.getDistancia();
 
-//            System.out.println("Desencolando vértice: "
-//                    + u.getNombre() + " con distancia provisional " + du);
             for (Arista a : grafo.obtenerAdyacentes(u)) {
                 Vertice v = a.getDestino();
                 double alt = du + a.getDistancia();
                 if (alt < distancias.get(v)) {
 
-//                    System.out.println(" Relax: mejora distancia de "
-//                            + v.getNombre() + " de " + distancias.get(v)
-//                            + " a " + alt);
                     distancias.put(v, alt);
                     previos.put(v, u);
                     cola.add(new DistanciaNodo(v, alt));
@@ -78,8 +73,6 @@ public final class Dijkstra {
 
         }
 
-//        System.out.println("Ruta final de " + origen.getNombre()
-//                + " a " + destino.getNombre() + ": " + caminoMasTexto(previos, destino));
         return subGrafo;
     }
 

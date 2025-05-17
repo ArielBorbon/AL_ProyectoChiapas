@@ -17,10 +17,10 @@ public class Arista {
      * @param destino   vértice de destino.
      * @param distancia Peso de la arista.
      */
-    public Arista(Vertice origen, Vertice destino, double distancia) {
-        this.origen = origen;
-        this.destino = destino;
-        this.distancia = distancia;
+    public Arista(Vertice origen, Vertice destino, double distancia) {          // T(N) = 6         O(1)
+        this.origen = origen;           //1
+        this.destino = destino;         //1
+        this.distancia = distancia;     //1
     }
 
     /**
@@ -29,7 +29,7 @@ public class Arista {
      * @return vertice de origen de la arista.
      */
     public Vertice getOrigen() {
-        return origen;
+        return origen;       //1
     }
 
     /**
@@ -38,7 +38,7 @@ public class Arista {
      * @return vertice de destino de la arista.
      */
     public Vertice getDestino() {
-        return destino;
+        return destino;      //1
     }
 
     /**
@@ -47,7 +47,7 @@ public class Arista {
      * @return peso de la arista.
      */
     public double getDistancia() {
-        return distancia;
+        return distancia;        //1
     }
 
 }
