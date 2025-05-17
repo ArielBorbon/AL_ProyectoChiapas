@@ -1,15 +1,15 @@
 package GUI;
 
-public class ModalRutaMasCorta extends javax.swing.JDialog {
+public class ModalRutaMasCorta extends javax.swing.JDialog {                        //T(N) = 89      O(1)
 
     private int opcion;
 
     /**
      * Creates new form ModalRutaMasCorta
      */
-    public ModalRutaMasCorta(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
-        initComponents();
+    public ModalRutaMasCorta(java.awt.Frame parent, boolean modal) {        //52
+        super(parent, modal);       //1
+        initComponents();           //51
     }
 
     /**
@@ -92,19 +92,21 @@ public class ModalRutaMasCorta extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    //51
+    
+    
     private void btnContinuarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinuarActionPerformed
-        this.opcion = comboBoxOpcion.getSelectedIndex();
-        this.dispose();
+        this.opcion = comboBoxOpcion.getSelectedIndex();            //2
+        this.dispose();                                             //1
     }//GEN-LAST:event_btnContinuarActionPerformed
 
     public void mostrarModal() {
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        this.setLocationRelativeTo(null);                       //1
+        this.setVisible(true);                                  //1
     }
 
     public int getOpcion() {
-        return opcion;
+        return opcion;                                          //1
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -113,4 +115,5 @@ public class ModalRutaMasCorta extends javax.swing.JDialog {
     private javax.swing.JLabel lblOrigen;
     private javax.swing.JPanel pnlPrincipal;
     // End of variables declaration//GEN-END:variables
+        //4
 }

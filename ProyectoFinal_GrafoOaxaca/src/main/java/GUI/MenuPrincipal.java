@@ -9,87 +9,88 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class MenuPrincipal extends JFrame {
+public class MenuPrincipal extends JFrame {                                      //         T(n) = 214          O(1)
+
     private JPanel panelMenuLateral;
     private PanelDefault panelDefault;
-    public MenuPrincipal() {
-        this.setTitle("ALGORITMOS DE GRAFOS EN CHIAPAS");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(1000, 800);
-        this.setLayout(new BorderLayout());
+
+    public MenuPrincipal() {                                                //213
+        this.setTitle("ALGORITMOS DE GRAFOS EN CHIAPAS");       //1
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);       //1
+        this.setSize(1000, 800);                        //1
+        this.setLayout(new BorderLayout());                     //2
 
         panelMenuLateral = new JPanel();
-        panelMenuLateral.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = GridBagConstraints.RELATIVE;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.weighty = 1.0; // Hace que los botones se expandan verticalmente
+        panelMenuLateral.setLayout(new GridBagLayout());            //2
+        GridBagConstraints gbc = new GridBagConstraints();          //2
+        gbc.fill = GridBagConstraints.HORIZONTAL;               //2
+        gbc.gridx = 0;                                          //2
+        gbc.gridy = GridBagConstraints.RELATIVE;                //2
+        gbc.weightx = 1.0;                                      //2
+        gbc.insets = new Insets(10, 10, 10, 10);            //2
+        gbc.weighty = 1.0; // Hace que los botones se expandan verticalmente        //2
 
         // Crear botones manualmente sin usar un loop
-        JButton btnVisualizar = GUI.Estilos.crearBoton("Visualizar");
-        JButton btnRecorrer = GUI.Estilos.crearBoton("Recorrer");
-        JButton btnMST = GUI.Estilos.crearBoton("Árbol de expansión mínima");
-        JButton btnRutaMasCorta = GUI.Estilos.crearBoton("Ruta más corta");
-        JButton btnReportes = GUI.Estilos.crearBoton("Reportes de complejidad temporal");
-        JButton btnSalir = GUI.Estilos.crearBoton("Salir");
+        JButton btnVisualizar = GUI.Estilos.crearBoton("Visualizar");           //23                    considerando el metodo de crearBoton en estilos
+        JButton btnRecorrer = GUI.Estilos.crearBoton("Recorrer");               //23
+        JButton btnMST = GUI.Estilos.crearBoton("Árbol de expansión mínima");           //23
+        JButton btnRutaMasCorta = GUI.Estilos.crearBoton("Ruta más corta");             //23
+        JButton btnReportes = GUI.Estilos.crearBoton("Reportes de complejidad temporal");       //23
+        JButton btnSalir = GUI.Estilos.crearBoton("Salir");                                     //23
 
         // Agregar botones manualmente
-        panelMenuLateral.add(btnVisualizar, gbc);
-        panelMenuLateral.add(btnRecorrer, gbc);
-        panelMenuLateral.add(btnMST, gbc);
-        panelMenuLateral.add(btnRutaMasCorta, gbc);
-        panelMenuLateral.add(btnReportes, gbc);
-        panelMenuLateral.add(btnSalir, gbc);
+        panelMenuLateral.add(btnVisualizar, gbc);                           //1
+        panelMenuLateral.add(btnRecorrer, gbc);                             //1
+        panelMenuLateral.add(btnMST, gbc);                                  //1
+        panelMenuLateral.add(btnRutaMasCorta, gbc);                         //1
+        panelMenuLateral.add(btnReportes, gbc);                             //1
+        panelMenuLateral.add(btnSalir, gbc);                                //1
 
         // Agregar el panel al JFrame
-        this.add(panelMenuLateral, BorderLayout.WEST);
-        this.setVisible(true);
-        this.add(this.panelDefault = new PanelDefault(), BorderLayout.CENTER);
+        this.add(panelMenuLateral, BorderLayout.WEST);                      //2
+        this.setVisible(true);                                                         //1
+        this.add(this.panelDefault = new PanelDefault(), BorderLayout.CENTER);  //4
         // Agregar acciones a los botones manualmente sin condicionales
-        btnVisualizar.addActionListener(e -> {
-            this.getContentPane().removeAll();
-            this.add(new PanelVisualizar(), BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();
+        btnVisualizar.addActionListener(e -> {                                           //1
+            this.getContentPane().removeAll();                                           //2
+            this.add(new PanelVisualizar(), BorderLayout.CENTER);               //3
+            this.revalidate();                                                          //1
+            this.repaint();                                                                 //1
         });
 
-        btnRecorrer.addActionListener(e -> {
-            this.getContentPane().removeAll();
-            this.add(new PanelRecorrer(), BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();
+        btnRecorrer.addActionListener(e -> {                                                //1
+            this.getContentPane().removeAll();                                              //2
+            this.add(new PanelRecorrer(), BorderLayout.CENTER);                     //3
+            this.revalidate();                                                              //1
+            this.repaint();                                                                 //1
         });
 
-        btnMST.addActionListener(e -> {
-            this.getContentPane().removeAll();
-            this.add(new PanelMST(), BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();
+        btnMST.addActionListener(e -> {                                                     //1
+            this.getContentPane().removeAll();                                              //2
+            this.add(new PanelMST(), BorderLayout.CENTER);                          //3
+            this.revalidate();                                                              //1
+            this.repaint();                                                                 //1
         });
 
-        btnRutaMasCorta.addActionListener(e -> {
-            this.getContentPane().removeAll();
-            this.add(new PanelRutaMasCorta(), BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();
+        btnRutaMasCorta.addActionListener(e -> {                                            //1
+            this.getContentPane().removeAll();                                              //2
+            this.add(new PanelRutaMasCorta(), BorderLayout.CENTER);                 //3
+            this.revalidate();                                                              //1
+            this.repaint();                                                                 //1
         });
 
-        btnReportes.addActionListener(e -> {
-            this.getContentPane().removeAll();
-            this.add(new PanelReportes(), BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();
+        btnReportes.addActionListener(e -> {                                                //1
+            this.getContentPane().removeAll();                                              //2
+            this.add(new PanelReportes(), BorderLayout.CENTER);                     //3
+            this.revalidate();                                                              //1
+            this.repaint();                                                                 //1
         });
 
-        btnSalir.addActionListener(e -> System.exit(0));
+        btnSalir.addActionListener(e -> System.exit(0));                                //2
     }
 
     public JPanel getPanelMenuLateral() {
-        return panelMenuLateral;
+        return panelMenuLateral;                                                                //1
     }
 
-   
 }
