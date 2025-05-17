@@ -3,11 +3,8 @@ package GUI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,11 +12,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import Algoritmos.Busqueda.BFS;
-import Algoritmos.Busqueda.DFS;
 import Implementacion.Arista;
+import Implementacion.ColorVertice;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.function.Consumer;
 
 public class PanelRecorrer extends JPanel {
 
@@ -123,173 +125,239 @@ public class PanelRecorrer extends JPanel {
     }
 
     private void pintarRecorridoBFS(String semillaNombre) {
-    new Thread(() -> {
-        try {
-            GrafoTDA base = new GrafoChiapas().getGrafo();
-            Vertice semilla = base.obtenerVertices().stream()
-                    .filter(v -> v.getNombre().equals(semillaNombre))
-                    .findFirst().orElseThrow();
+        new Thread(() -> {
+            try {
+                GrafoTDA base = new GrafoChiapas().getGrafo();
+                Vertice semilla = base.obtenerVertices().stream()
+                        .filter(v -> v.getNombre().equals(semillaNombre))
+                        .findFirst().orElseThrow();
 
-            // Grafo parcial para ir acumulando y pintando aristas poco a poco
-            GrafoTDA bfsParcial = new GrafoTDA();
-            base.obtenerVertices().forEach(bfsParcial::agregarVertice);
+                Map<Vertice, ColorVertice> color = new HashMap<>();
+                Map<Vertice, Integer> nivel = new HashMap<>();
+                Map<Vertice, Double> pesos = new HashMap<>();
 
-            // Registrar listener para animar paso a paso
-            BFS.setListener(arista -> {
-                bfsParcial.agregarArista(arista.getOrigen(), arista.getDestino(), arista.getDistancia());
-                arista.getDestino().setAnterior(arista.getOrigen());
+                for (Vertice v : base.obtenerVertices()) {
+                    color.put(v, ColorVertice.BLANCO);
+                }
 
-                JPanel panelPaso = PanelGrafo.obtenerGrafoPintado(bfsParcial);
+                GrafoTDA arbol = new GrafoTDA();
+                base.obtenerVertices().forEach(arbol::agregarVertice);
+
+                List<Vertice> ordenDescubrimiento = new ArrayList<>();
+                Queue<Vertice> cola = new LinkedList<>();
+
+                color.put(semilla, ColorVertice.GRIS);
+                cola.add(semilla);
+                nivel.put(semilla, 0);
+                pesos.put(semilla, 0.0);
+                ordenDescubrimiento.add(semilla);
+
                 SwingUtilities.invokeLater(() -> {
                     removeCurrentGrafoPanel();
-                    add(panelPaso, BorderLayout.CENTER);
+                    add(PanelGrafo.obtenerGrafoPintadoRecorrido(color, arbol),
+                            BorderLayout.CENTER);
                     revalidate();
                     repaint();
                 });
-            });
+                Thread.sleep(800);
 
-            // Ejecutar BFS con animación
-            BFS.Resultado res = BFS.ejecutarBFS(base, semilla);
+                while (!cola.isEmpty()) {
+                    Vertice u = cola.poll();
 
-            // Mostrar resultado textual al final
-            StringBuilder sb = new StringBuilder();
-            sb.append("BFS desde ").append(semillaNombre).append("\n\n")
-              .append("Orden de descubrimiento (con pesos):\n");
+                    for (Arista a : base.obtenerAdyacentes(u)) {
+                        Vertice v = a.getDestino();
+                        if (color.get(v) == ColorVertice.BLANCO) {
+                            color.put(v, ColorVertice.GRIS);
+                            arbol.agregarArista(u, v, a.getDistancia());
+                            arbol.agregarArista(v, u, a.getDistancia());
 
-            int pesoTotal = 0;
-            List<Vertice> orden = res.orden;
+                            pesos.put(v, a.getDistancia());
+                            nivel.put(v, nivel.get(u) + 1);
+                            ordenDescubrimiento.add(v);
 
-            for (int i = 0; i < orden.size(); i++) {
-                Vertice v = orden.get(i);
-                double peso = 0;
+                            SwingUtilities.invokeLater(() -> {
+                                removeCurrentGrafoPanel();
+                                add(PanelGrafo.obtenerGrafoPintadoRecorrido(color, arbol),
+                                        BorderLayout.CENTER);
+                                revalidate();
+                                repaint();
+                            });
+                            Thread.sleep(800);
 
-                Vertice anterior = v.getAnterior();
-                if (anterior != null) {
-                    List<Arista> aristas = res.arbol.get(anterior);
-                    if (aristas != null) {
-                        for (Arista a : aristas) {
-                            if (a.getDestino().equals(v)) {
-                                peso = a.getDistancia();
-                                pesoTotal += peso;
-                                break;
-                            }
+                            cola.add(v);
                         }
                     }
+
+                    color.put(u, ColorVertice.NEGRO);
+                    SwingUtilities.invokeLater(() -> {
+                        removeCurrentGrafoPanel();
+                        add(PanelGrafo.obtenerGrafoPintadoRecorrido(color, arbol),
+                                BorderLayout.CENTER);
+                        revalidate();
+                        repaint();
+                    });
+                    Thread.sleep(800);
                 }
 
-                sb.append(v.getNombre()).append(" (").append(peso).append(")");
-                if (i < orden.size() - 1) {
-                    sb.append(" → ");
+                StringBuilder sb = new StringBuilder();
+                sb.append("BFS desde ").append(semillaNombre).append("\n\n");
+
+                sb.append("Orden de descubrimiento con niveles:\n");
+                int i = 1;
+                for (Vertice v : ordenDescubrimiento) {
+                    sb.append(i++)
+                            .append(". ")
+                            .append(v.getNombre())
+                            .append(" (nivel: ")
+                            .append(nivel.getOrDefault(v, 0))
+                            .append(")\n");
                 }
+
+                sb.append("\nOrden de descubrimiento con pesos:\n");
+                int pesoTotal = 0;
+                for (int j = 0; j < ordenDescubrimiento.size(); j++) {
+                    Vertice v = ordenDescubrimiento.get(j);
+                    double peso = pesos.getOrDefault(v, 0.0);
+                    sb.append(v.getNombre()).append(" (").append(peso).append(")");
+                    if (j < ordenDescubrimiento.size() - 1) {
+                        sb.append(" → ");
+                    }
+                    pesoTotal += peso;
+                }
+
+                sb.append("\n\nPeso total del recorrido: ").append(pesoTotal);
+
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                        this,
+                        sb.toString(),
+                        "Resultado BFS",
+                        JOptionPane.INFORMATION_MESSAGE
+                ));
+
+            } catch (Exception ex) {
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                        this,
+                        "Error en BFS: " + ex.getMessage(),
+                        "BFS",
+                        JOptionPane.ERROR_MESSAGE));
             }
-
-            sb.append("\n\nPeso total del recorrido: ").append(pesoTotal);
-            sb.append("\n\nNiveles:\n");
-
-            res.nivel.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getKey().getNombre()))
-                .forEach(en -> sb.append(en.getKey().getNombre())
-                    .append(": ").append(en.getValue())
-                    .append("\n"));
-
-            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
-                this,
-                sb.toString(),
-                "Resultado BFS",
-                JOptionPane.INFORMATION_MESSAGE
-            ));
-
-        } catch (NoSuchElementException ex) {
-            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
-                this,
-                "Ciudad no encontrada: " + semillaNombre,
-                "BFS", JOptionPane.ERROR_MESSAGE));
-        }
-    }).start();
-}
-
+        }).start();
+    }
 
     private void pintarRecorridoDFS(String semillaNombre) {
-    new Thread(() -> {
-        try {
-            GrafoTDA base = new GrafoChiapas().getGrafo();
-            Vertice semilla = base.obtenerVertices().stream()
-                    .filter(v -> v.getNombre().equals(semillaNombre))
-                    .findFirst().orElseThrow();
+        new Thread(() -> {
+            try {
+                GrafoTDA base = new GrafoChiapas().getGrafo();
+                Vertice semilla = base.obtenerVertices().stream()
+                        .filter(v -> v.getNombre().equals(semillaNombre))
+                        .findFirst().orElseThrow();
 
-            // Crear grafo parcial acumulativo para ir mostrando las aristas paso a paso
-            GrafoTDA dfsParcial = new GrafoTDA();
-            base.obtenerVertices().forEach(dfsParcial::agregarVertice);
+                Map<Vertice, ColorVertice> color = new HashMap<>();
+                Map<Vertice, Double> pesos = new HashMap<>();
 
-            // Configurar listener para pintar paso a paso
-            DFS.setListener(arista -> {
-                dfsParcial.agregarArista(arista.getOrigen(), arista.getDestino(), arista.getDistancia());
-                arista.getDestino().setAnterior(arista.getOrigen());
+                for (Vertice v : base.obtenerVertices()) {
+                    color.put(v, ColorVertice.BLANCO);
+                }
 
-                JPanel panelPaso = PanelGrafo.obtenerGrafoPintado(dfsParcial);
-                SwingUtilities.invokeLater(() -> {
-                    removeCurrentGrafoPanel();
-                    add(panelPaso, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
-                });
-            });
+                GrafoTDA arbol = new GrafoTDA();
+                base.obtenerVertices().forEach(arbol::agregarVertice);
 
-            // Ejecutar DFS con animación
-            DFS.Resultado res = DFS.ejecutarDFS(base, semilla);
+                List<Vertice> ordenDescubrimiento = new ArrayList<>();
 
-            // Mostrar resultado textual al final
-            StringBuilder sb = new StringBuilder();
-            sb.append("DFS desde ").append(semillaNombre).append("\n\n")
-                    .append("Orden de descubrimiento (con pesos):\n");
+                Consumer<Vertice> dfsVisitar = new Consumer<>() {
+                    @Override
+                    public void accept(Vertice u) {
+                        try {
+                            color.put(u, ColorVertice.GRIS);
+                            ordenDescubrimiento.add(u);
 
-            int pesoTotal = 0;
-            List<Vertice> orden = res.orden;
-            for (int i = 0; i < orden.size(); i++) {
-                Vertice v = orden.get(i);
-                double peso = 0;
+                            SwingUtilities.invokeLater(() -> {
+                                removeCurrentGrafoPanel();
+                                add(PanelGrafo.obtenerGrafoPintadoRecorrido(color, arbol),
+                                        BorderLayout.CENTER);
+                                revalidate();
+                                repaint();
+                            });
+                            Thread.sleep(800);
 
-                Vertice anterior = v.getAnterior();
-                if (anterior != null) {
-                    List<Arista> aristas = res.arbol.get(anterior);
-                    if (aristas != null) {
-                        for (Arista a : aristas) {
-                            if (a.getDestino().equals(v)) {
-                                peso = a.getDistancia();
-                                pesoTotal += peso;
-                                break;
+                            for (Arista a : base.obtenerAdyacentes(u)) {
+                                Vertice v = a.getDestino();
+                                if (color.get(v) == ColorVertice.BLANCO) {
+                                    arbol.agregarArista(u, v, a.getDistancia());
+                                    arbol.agregarArista(v, u, a.getDistancia());
+
+                                    pesos.put(v, a.getDistancia());
+                                    accept(v);
+                                }
                             }
+
+                            color.put(u, ColorVertice.NEGRO);
+                            SwingUtilities.invokeLater(() -> {
+                                removeCurrentGrafoPanel();
+                                add(PanelGrafo.obtenerGrafoPintadoRecorrido(color, arbol),
+                                        BorderLayout.CENTER);
+                                revalidate();
+                                repaint();
+                            });
+                            Thread.sleep(800);
+
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                         }
+                    }
+                };
+
+                pesos.put(semilla, 0.0);
+                dfsVisitar.accept(semilla);
+
+                for (Vertice v : base.obtenerVertices()) {
+                    if (color.get(v) == ColorVertice.BLANCO) {
+                        pesos.put(v, 0.0);
+                        dfsVisitar.accept(v);
                     }
                 }
 
-                sb.append(v.getNombre()).append(" (").append(peso).append(")");
-                if (i < orden.size() - 1) {
-                    sb.append(" → ");
+                StringBuilder sb = new StringBuilder();
+                sb.append("DFS desde ").append(semillaNombre).append("\n\n");
+
+                sb.append("Orden de descubrimiento:\n");
+                int i = 1;
+                for (Vertice v : ordenDescubrimiento) {
+                    sb.append(i++)
+                            .append(". ")
+                            .append(v.getNombre())
+                            .append("\n");
                 }
+
+                sb.append("\nOrden de descubrimiento con pesos:\n");
+                int pesoTotal = 0;
+                for (int j = 0; j < ordenDescubrimiento.size(); j++) {
+                    Vertice v = ordenDescubrimiento.get(j);
+                    double peso = pesos.getOrDefault(v, 0.0);
+                    sb.append(v.getNombre()).append(" (").append(peso).append(")");
+                    if (j < ordenDescubrimiento.size() - 1) {
+                        sb.append(" → ");
+                    }
+                    pesoTotal += peso;
+                }
+
+                sb.append("\n\nPeso total del recorrido: ").append(pesoTotal);
+
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                        this,
+                        sb.toString(),
+                        "Resultado DFS",
+                        JOptionPane.INFORMATION_MESSAGE
+                ));
+
+            } catch (Exception ex) {
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                        this,
+                        "Error en DFS: " + ex.getMessage(),
+                        "DFS",
+                        JOptionPane.ERROR_MESSAGE));
             }
-
-            sb.append("\n\nPeso total del recorrido: ").append(pesoTotal);
-
-            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
-                    this,
-                    sb.toString(),
-                    "Resultado DFS",
-                    JOptionPane.INFORMATION_MESSAGE
-            ));
-
-        } catch (NoSuchElementException ex) {
-            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
-                    this,
-                    "Ciudad no encontrada: " + semillaNombre,
-                    "DFS",
-                    JOptionPane.ERROR_MESSAGE
-            ));
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PanelRecorrer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }).start();
-}
-
+        }).start();
+    }
 
 }

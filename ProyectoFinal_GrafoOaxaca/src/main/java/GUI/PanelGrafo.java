@@ -10,6 +10,7 @@ import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.swing_viewer.ViewPanel;
 
 import Implementacion.Arista;
+import Implementacion.ColorVertice;
 import Implementacion.GrafoTDA;
 import Implementacion.Vertice;
 import java.awt.Dimension;
@@ -233,7 +234,6 @@ public class PanelGrafo {
                 String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
                 Edge e = g.getEdge(id1);
                 if (e == null) {
-                    // capaz y la arista está al reves
                     e = g.getEdge(a.getDestino().getNombre() + "-" + a.getOrigen().getNombre());
                 }
                 if (e != null) {
@@ -260,4 +260,65 @@ public class PanelGrafo {
         return vp;
     }
 
+    
+        /**
+     * Pinta el grafo base de Chiapas: colorea cada nodo según el mapa de color,
+     * y resalta las aristas que estén en subGrafoRecorrido (árbol de BFS/DFS).
+     *
+     * @param colorMap        Mapa de cada vértice a su ColorVertice (BLANCO/GRIS/NEGRO)
+     * @param subGrafoRecorrido GrafoTDA con las aristas del árbol de recorrido
+     */
+    public static JPanel obtenerGrafoPintadoRecorrido(
+            Map<Vertice, ColorVertice> colorMap,
+            GrafoTDA subGrafoRecorrido) {
+
+        Graph g = crearGrafoChiapas();
+
+        g.setAttribute("ui.stylesheet", """
+            node {
+              fill-color: rgb(134,192,160);
+              size: 30px;
+              text-alignment: center;
+              text-size: 12px;
+            }
+            node.blanco { fill-color: rgb(134,192,160); }
+            node.gris   { fill-color: orange; }
+            node.negro  { fill-color: gray; }
+            edge { fill-color: rgb(130,130,130); size: 2px; }
+            edge.highlighted { fill-color: red; size: 3px; }
+        """);
+
+        for (Vertice u : subGrafoRecorrido.obtenerVertices()) {
+            for (Arista a : subGrafoRecorrido.obtenerAdyacentes(u)) {
+                String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
+                Edge e = g.getEdge(id1);
+                if (e == null) {
+                    e = g.getEdge(a.getDestino().getNombre() + "-" + a.getOrigen().getNombre());
+                }
+                if (e != null) {
+                    e.setAttribute("ui.class", "highlighted");
+                }
+            }
+        }
+
+        for (Map.Entry<Vertice, ColorVertice> entry : colorMap.entrySet()) {
+            Vertice v = entry.getKey();
+            ColorVertice cv = entry.getValue();
+            Node n = g.getNode(v.getNombre());
+            if (n != null) {
+                // asignamos blanco/gris/negro
+                n.setAttribute("ui.class", cv.name().toLowerCase());
+            }
+        }
+
+        SwingViewer viewer = new SwingViewer(g,
+            SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        viewer.disableAutoLayout();
+        ViewPanel vp = (ViewPanel) viewer.addDefaultView(false);
+        vp.setPreferredSize(new Dimension(800, 600));
+        vp.setMinimumSize(new Dimension(400, 300));
+        return vp;
+    }
+    
+    
 }
