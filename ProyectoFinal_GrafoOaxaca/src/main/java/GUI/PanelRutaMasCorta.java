@@ -25,131 +25,131 @@ import org.graphstream.graph.Node;
 import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.swing_viewer.ViewPanel;
 
-public class PanelRutaMasCorta extends JPanel {
+public class PanelRutaMasCorta extends JPanel {                                             // T(n) = 511n"2 + 1626
 
     public static final int OPCION_UNA_CIUDAD = 0;
     public static final int OPCION_DOS_CIUDADES = 1;
 
     private int opcion;
 
-    public PanelRutaMasCorta() {
-        initComponents();
-        mostrarGrafo();
+    public PanelRutaMasCorta() {                                                                                                                                    // 265n"2 + 414n + 1005
+        initComponents();   //246n" + 396n + 977
+        mostrarGrafo();     // 19n"2 + 18n + 28
     }
 
-    private void initComponents() {
+    private void initComponents() {                                                 //                                      246n" + 396n + 977
         //configuracion del panel
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout());                     //2
         //Crear botones
-        JButton btnBF = Estilos.crearBoton("Usar algoritmo de Bellman-Ford");
-        JButton btnDJK = Estilos.crearBoton("Usar algoritmo de Dijkstra");
-        JButton btnVolver = Estilos.crearBoton("Volver");
+        JButton btnBF = Estilos.crearBoton("Usar algoritmo de Bellman-Ford");                     //23
+        JButton btnDJK = Estilos.crearBoton("Usar algoritmo de Dijkstra");                     //23
+        JButton btnVolver = Estilos.crearBoton("Volver");                     //23
         //panel botones
-        JPanel panelBotones = new JPanel();
-        panelBotones.setLayout(new GridLayout(1, 3, 10, 10));
+        JPanel panelBotones = new JPanel();                     //2
+        panelBotones.setLayout(new GridLayout(1, 3, 10, 10));                     //2
 
-        panelBotones.add(btnBF, BorderLayout.CENTER);
-        panelBotones.add(btnDJK, BorderLayout.CENTER);
-        panelBotones.add(btnVolver, BorderLayout.CENTER);
-        add(panelBotones, BorderLayout.SOUTH);
+        panelBotones.add(btnBF, BorderLayout.CENTER);                     //2
+        panelBotones.add(btnDJK, BorderLayout.CENTER);                     //2
+        panelBotones.add(btnVolver, BorderLayout.CENTER);                     //2
+        add(panelBotones, BorderLayout.SOUTH);                     //2
 
         //Metodo para regresar con el boton volver
         btnVolver.addActionListener(e -> {
             // Obtener el JFrame (ventana) que contiene este panel
-            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);                     //3
 
-            if (ventana instanceof MenuPrincipal) {
-                MenuPrincipal menu = (MenuPrincipal) ventana;
+            if (ventana instanceof MenuPrincipal) {                     //1
+                MenuPrincipal menu = (MenuPrincipal) ventana;                     //2
 
                 // Limpiar todo lo que hay actualmente en la ventana
-                menu.getContentPane().removeAll();
+                menu.getContentPane().removeAll();                     //2
 
                 // Volver a agregar el panel del menú lateral
-                menu.add(menu.getPanelMenuLateral(), BorderLayout.WEST);
+                menu.add(menu.getPanelMenuLateral(), BorderLayout.WEST);                     //2
 
                 // Agregar algún panel de inicio o bienvenida, si lo usas
-                menu.add(new PanelDefault(), BorderLayout.CENTER);
+                menu.add(new PanelDefault(), BorderLayout.CENTER);                     //3
 
                 // Actualizar la interfaz gráfica
-                menu.revalidate();
-                menu.repaint();
+                menu.revalidate();                     //1
+                menu.repaint();                     //1
             }
         });
 
         btnDJK.addActionListener(e -> {
-            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);                     //3
 
-            if (ventana instanceof MenuPrincipal) {
-                MenuPrincipal menu = (MenuPrincipal) ventana;
+            if (ventana instanceof MenuPrincipal) {                     //1
+                MenuPrincipal menu = (MenuPrincipal) ventana;                     //2
 
-                ModalRutaMasCorta modalOpciones = new ModalRutaMasCorta(menu, true);
-                modalOpciones.mostrarModal();
-                this.opcion = modalOpciones.getOpcion();
+                ModalRutaMasCorta modalOpciones = new ModalRutaMasCorta(menu, true);                     //2
+                modalOpciones.mostrarModal();                     //1
+                this.opcion = modalOpciones.getOpcion();                     //2
 
-                String ciudadOrigen = "";
-                String ciudadDestino = "";
-                if (this.opcion == OPCION_DOS_CIUDADES) {
-                    boolean seleccionValida = false;
-                    while (!seleccionValida) {
-                        ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);
-                        modalSeleccionarFuente.mostrar();
-                        ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();
-                        ciudadDestino = modalSeleccionarFuente.getCiudadDestino();
-                        if (ciudadDestino.equals(ciudadOrigen)) {
+                String ciudadOrigen = "";                     //1
+                String ciudadDestino = "";                     //1
+                if (this.opcion == OPCION_DOS_CIUDADES) {                     //2
+                    boolean seleccionValida = false;                     //1
+                    while (!seleccionValida) {                     //1
+                        ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);                     //2
+                        modalSeleccionarFuente.mostrar();                               //1n
+                        ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();                     //2n
+                        ciudadDestino = modalSeleccionarFuente.getCiudadDestino();                     //2n
+                        if (ciudadDestino.equals(ciudadOrigen)) {                     //1n
                             JOptionPane.showMessageDialog(this,
                                     "Por favor, selecciona 2 localidades distintas.",
                                     "Misma ubicación",
-                                    JOptionPane.ERROR_MESSAGE);
+                                    JOptionPane.ERROR_MESSAGE);                     //2n
                         } else {
-                            seleccionValida = true;
+                            seleccionValida = true;                     //1n
                         }
                     }
-                    pintarRutaDijkstra(ciudadOrigen, ciudadDestino);
-                } else if (this.opcion == OPCION_UNA_CIUDAD) {
-                    ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);
-                    modalSeleccionarFuente.mostrar();
-                    ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();
-                    pintarRutaDijkstraTodas(ciudadOrigen);
+                    pintarRutaDijkstra(ciudadOrigen, ciudadDestino);        //         46n"2 + 97n + 99
+                } else if (this.opcion == OPCION_UNA_CIUDAD) {                       //1
+                    ModalSeleccionarFuente modalSeleccionarFuente = new ModalSeleccionarFuente(menu, true, this.opcion);                     //2
+                    modalSeleccionarFuente.mostrar();                     //1
+                    ciudadOrigen = modalSeleccionarFuente.getCiudadOrigen();                     //2
+                    pintarRutaDijkstraTodas(ciudadOrigen);                     // 86n"2 + 73n + 125
                 }
             }
         });
 
         btnBF.addActionListener(e
                 -> {
-            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
-            if (!(ventana instanceof MenuPrincipal)) {
-                return;
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);                     //3
+            if (!(ventana instanceof MenuPrincipal)) {                                           //2
+                return;                     //1
             }
-            MenuPrincipal menu = (MenuPrincipal) ventana;
+            MenuPrincipal menu = (MenuPrincipal) ventana;                     //2
 
-            ModalRutaMasCorta modalOpc = new ModalRutaMasCorta(menu, true);
-            modalOpc.mostrarModal();
-            this.opcion = modalOpc.getOpcion();
+            ModalRutaMasCorta modalOpc = new ModalRutaMasCorta(menu, true);                     //2
+            modalOpc.mostrarModal();                     //1
+            this.opcion = modalOpc.getOpcion();                     //2
 
-            String ciudadOrigen = "";
-            String ciudadDestino = "";
-            if (opcion == OPCION_DOS_CIUDADES) {
-                boolean ok = false;
-                while (!ok) {
-                    ModalSeleccionarFuente msf = new ModalSeleccionarFuente(menu, true, opcion);
-                    msf.mostrar();
-                    ciudadOrigen = msf.getCiudadOrigen();
-                    ciudadDestino = msf.getCiudadDestino();
-                    if (ciudadOrigen.equals(ciudadDestino)) {
+            String ciudadOrigen = "";                     //1
+            String ciudadDestino = "";                     //1
+            if (opcion == OPCION_DOS_CIUDADES) {                     //1
+                boolean ok = false;                     //1
+                while (!ok) {                     //1
+                    ModalSeleccionarFuente msf = new ModalSeleccionarFuente(menu, true, opcion);                     //2
+                    msf.mostrar();                     //1
+                    ciudadOrigen = msf.getCiudadOrigen();                     //2
+                    ciudadDestino = msf.getCiudadDestino();                     //2
+                    if (ciudadOrigen.equals(ciudadDestino)) {                     //1
                         JOptionPane.showMessageDialog(this,
                                 "Selecciona dos localidades distintas",
                                 "Error de selección",
-                                JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.ERROR_MESSAGE);                     //2
                     } else {
-                        ok = true;
+                        ok = true;                     //1
                     }
                 }
-                pintarRutaBellmanFord(ciudadOrigen, ciudadDestino);
+                pintarRutaBellmanFord(ciudadOrigen, ciudadDestino);                     //34n"2 + 93n + 276
             } else {
-                ModalSeleccionarFuente msf = new ModalSeleccionarFuente(menu, true, opcion);
-                msf.mostrar();
-                ciudadOrigen = msf.getCiudadOrigen();
-                pintarRutaBellmanFordTodas(ciudadOrigen);
+                ModalSeleccionarFuente msf = new ModalSeleccionarFuente(menu, true, opcion);                     //2
+                msf.mostrar();                     //1
+                ciudadOrigen = msf.getCiudadOrigen();                     //2
+                pintarRutaBellmanFordTodas(ciudadOrigen);                     //80n"2 + 124n + 311
             }
         });
 
@@ -159,32 +159,32 @@ public class PanelRutaMasCorta extends JPanel {
     
     
 
-    private void mostrarGrafo() {
-        JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();
+    private void mostrarGrafo() {                          //                                                                                       19n"2 + 18 + 28
+        JPanel panelGrafo = PanelGrafo.obtenerPanelGrafo();                     //19n"2 + 18n + 18
 
-        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
-        if (panelCentral != null) {
-            remove(panelCentral);
+        Component panelCentral = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);                     //4
+        if (panelCentral != null) {                     //1
+            remove(panelCentral);                     //1
         }
-        add(panelGrafo, BorderLayout.CENTER);
+        add(panelGrafo, BorderLayout.CENTER);                       //2
 
-        revalidate();
-        repaint();
+        revalidate();                     //1
+        repaint();                     //1
 
     }
 
-    private void pintarRutaDijkstra(String origenNombre, String destinoNombre) {
-        new Thread(() -> {
+    private void pintarRutaDijkstra(String origenNombre, String destinoNombre) {        //                                                                      46n"2 + 97n + 99
+        new Thread(() -> {                          //1
             try {
-                GrafoTDA base = new GrafoChiapas().getGrafo();
-                Vertice origen = findVertice(base, origenNombre);
-                Vertice destino = findVertice(base, destinoNombre);
+                GrafoTDA base = new GrafoChiapas().getGrafo();                          //3
+                Vertice origen = findVertice(base, origenNombre);                          //2
+                Vertice destino = findVertice(base, destinoNombre);                          //2
 
-                Dijkstra.ResultadoPrevia previa = Dijkstra.ejecutarPrevia(base, origen);
-                List<Arista> camino = Dijkstra.caminoMasCortoListaAristas(base, origen, destino);
+                Dijkstra.ResultadoPrevia previa = Dijkstra.ejecutarPrevia(base, origen);                          //  15n"2  + 12n  + 21
+                List<Arista> camino = Dijkstra.caminoMasCortoListaAristas(base, origen, destino);                          // //        16n"2  +  24n + 17
 
-                System.setProperty("org.graphstream.ui", "swing");
-                Graph graph = PanelGrafo.crearGrafoChiapas();
+                System.setProperty("org.graphstream.ui", "swing");                         //2
+                Graph graph = PanelGrafo.crearGrafoChiapas();                       //                  19n"2    +   18n   + 9
                 graph.setAttribute("ui.stylesheet", """
                 node {
                   fill-color: rgb(134,192,160);
@@ -194,106 +194,106 @@ public class PanelRutaMasCorta extends JPanel {
                 node.negro { fill-color: gray;   }
                 edge { fill-color: rgb(130,130,130); size: 2px; }
                 edge.highlighted { fill-color: red; size: 4px; }
-            """);
+            """);                                                                                //1
 
-                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-                viewer.disableAutoLayout();
-                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);                         //4
+                viewer.disableAutoLayout();                         //1
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);                         //3
 
-                SwingUtilities.invokeLater(() -> {
-                    removeCurrentGrafoPanel();
-                    add(panel, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
+                SwingUtilities.invokeLater(() -> {                         //1
+                    removeCurrentGrafoPanel();                         //1
+                    add(panel, BorderLayout.CENTER);                         //2
+                    revalidate();                         //1
+                    repaint();                         //1
                 });
 
-                Vertice anterior = null;
-                for (Arista ar : camino) {
-                    graph.getNode(ar.getDestino().getNombre())
-                            .setAttribute("ui.class", "gris");
+                Vertice anterior = null;                         //1
+                for (Arista ar : camino) {                         //2n+1
+                    graph.getNode(ar.getDestino().getNombre())                         //3n
+                            .setAttribute("ui.class", "gris");                         //n
 
-                    String id1 = ar.getOrigen().getNombre() + "-" + ar.getDestino().getNombre();
-                    String id2 = ar.getDestino().getNombre() + "-" + ar.getOrigen().getNombre();
-                    Edge e = graph.getEdge(id1);
-                    if (e == null) {
-                        e = graph.getEdge(id2);
+                    String id1 = ar.getOrigen().getNombre() + "-" + ar.getDestino().getNombre();                         //7n
+                    String id2 = ar.getDestino().getNombre() + "-" + ar.getOrigen().getNombre();                         //7n
+                    Edge e = graph.getEdge(id1);                                                                 //2n
+                    if (e == null) {                                                                                      //n
+                        e = graph.getEdge(id2);                                                                 //2n
                     }
 
-                    if (e != null) {
-                        e.setAttribute("ui.class", "highlighted");
-                        e.setAttribute("ui.label", ar.getDistancia());
+                    if (e != null) {                                                         //n
+                        e.setAttribute("ui.class", "highlighted");                                   //n
+                        e.setAttribute("ui.label", ar.getDistancia());                         //2n
                     } else {
-                        System.err.println("Arista no encontrada: " + id1 + "/" + id2);
+                        System.err.println("Arista no encontrada: " + id1 + "/" + id2);                         //3n
                     }
 
-                    Thread.sleep(1200);
+                    Thread.sleep(1200);                                                          //n
 
-                    if (anterior != null) {
-                        graph.getNode(anterior.getNombre())
-                                .setAttribute("ui.class", "negro");
+                    if (anterior != null) {                                                      //n
+                        graph.getNode(anterior.getNombre())                         //2n
+                                .setAttribute("ui.class", "negro");                         //n
                     }
-                    anterior = ar.getDestino();
+                    anterior = ar.getDestino();                                                  //2n
                 }
 
-                if (anterior != null) {
-                    graph.getNode(anterior.getNombre())
-                            .setAttribute("ui.class", "negro");
+                if (anterior != null) {                                                      //1
+                    graph.getNode(anterior.getNombre())                         //2
+                            .setAttribute("ui.class", "negro");                         //1
                 }
 
-                Map<Vertice, Double> distAcum = previa.distancias;
-                List<Vertice> secuencia = new ArrayList<>();
-                for (Vertice v = destino; v != null; v = previa.previos.get(v)) {
-                    secuencia.add(0, v);
+                Map<Vertice, Double> distAcum = previa.distancias;                               //2
+                List<Vertice> secuencia = new ArrayList<>();                                         //2
+                for (Vertice v = destino; v != null; v = previa.previos.get(v)) {                                 //3n+2
+                    secuencia.add(0, v);                                                  //n
                 }
 
-                String texto = secuencia.stream()
-                        .map(v -> v.getNombre() + " (" + (int) Math.round(distAcum.getOrDefault(v, 0.0)) + ")")
-                        .collect(Collectors.joining(" → "));
+                String texto = secuencia.stream()                         //2
+                        .map(v -> v.getNombre() + " (" + (int) Math.round(distAcum.getOrDefault(v, 0.0)) + ")")                         //6
+                        .collect(Collectors.joining(" → "));                         //2
 
-                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(                         //2
                         this,
-                        "Ruta " + origenNombre + " → " + destinoNombre + ":\n" + texto,
+                        "Ruta " + origenNombre + " → " + destinoNombre + ":\n" + texto,                         //4
                         "Dijkstra",
-                        JOptionPane.INFORMATION_MESSAGE
+                        JOptionPane.INFORMATION_MESSAGE                         //1
                 ));
 
             } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt();                         //2
             }
-        }).start();
+        }).start();                         //1
     }
 
     /**
      * Quita el panel central actual antes de añadir el nuevo
      */
-    private void removeCurrentGrafoPanel() {
-        Component actual = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
-        if (actual != null) {
-            remove(actual);
+    private void removeCurrentGrafoPanel() {                                                                                                                        //7
+        Component actual = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);                         //5
+        if (actual != null) {                         //1
+            remove(actual);                         //1
         }
     }
 
-    private Vertice findVertice(GrafoTDA grafo, String nombre) {
-        return grafo.obtenerVertices().stream()
-                .filter(v -> v.getNombre().equals(nombre))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                "No se encontró el vértice con nombre: " + nombre));
+    private Vertice findVertice(GrafoTDA grafo, String nombre) {                                                                                                    //8                       
+        return grafo.obtenerVertices().stream()                         //2
+                .filter(v -> v.getNombre().equals(nombre))                         //3
+                .findFirst()                                                    //1
+                .orElseThrow(() -> new IllegalArgumentException(                         //2
+                "No se encontró el vértice con nombre: " + nombre));                         
     }
 
-    private void pintarRutaDijkstraTodas(String origenNombre) {
-        new Thread(() -> {
-            try {
-                GrafoTDA base = new GrafoChiapas().getGrafo();
-                Vertice origen = findVertice(base, origenNombre);
+    private void pintarRutaDijkstraTodas(String origenNombre) {     //                                                                                                        86n"2 + 73n + 125
+        new Thread(() -> {                         //1
+            try {                         
+                GrafoTDA base = new GrafoChiapas().getGrafo();                         //3
+                Vertice origen = findVertice(base, origenNombre);                               //9
 
-                Dijkstra.ResultadoPrevia res = Dijkstra.ejecutarPrevia(base, origen);
-                GrafoTDA subGrafoCompleto = Dijkstra.caminoMasCortoTodas(base, origen);
-                Map<Vertice, Double> distAcum = res.distancias;
+                Dijkstra.ResultadoPrevia res = Dijkstra.ejecutarPrevia(base, origen);                         //  15n"2  + 12n  + 21
+                GrafoTDA subGrafoCompleto = Dijkstra.caminoMasCortoTodas(base, origen);         // 15n"2 + 31n + 36
+                Map<Vertice, Double> distAcum = res.distancias;                                 //2
 
-                System.setProperty("org.graphstream.ui", "swing");
-                Graph graph = PanelGrafo.crearGrafoChiapas();
-                graph.setAttribute("ui.stylesheet", """
+                System.setProperty("org.graphstream.ui", "swing");                                 //1
+                Graph graph = PanelGrafo.crearGrafoChiapas();                                 //19n"2    +   18n   + 10
+                graph.setAttribute("ui.stylesheet", """                                 
                 node {
                   fill-color: rgb(134,192,160);
                   size: 30px; text-alignment: center; text-size: 12px;
@@ -302,77 +302,77 @@ public class PanelRutaMasCorta extends JPanel {
                 node.negro { fill-color: gray;   }
                 edge { fill-color: rgb(130,130,130); size: 2px; }
                 edge.highlighted { fill-color: red; size: 4px; }
-            """);
-                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-                viewer.disableAutoLayout();
-                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
-                SwingUtilities.invokeLater(() -> {
-                    removeCurrentGrafoPanel();
-                    add(panel, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
+            """);                                 //1
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);                                 //4
+                viewer.disableAutoLayout();                                                                                                                      //1
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);                                                                      //3
+                SwingUtilities.invokeLater(() -> {                                                                                                             //1
+                    removeCurrentGrafoPanel();                                                                                                   //7
+                    add(panel, BorderLayout.CENTER);                                                                             //2
+                    revalidate();                                                                                                                            //1
+                    repaint();                                                                                                                               //1
                 });
 
-                Set<String> vistas = new HashSet<>();
-                for (Vertice u : subGrafoCompleto.obtenerVertices()) {
-                    for (Arista a : subGrafoCompleto.obtenerAdyacentes(u)) {
-                        String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
-                        String id2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
-                        if (vistas.contains(id1) || vistas.contains(id2)) {
+                Set<String> vistas = new HashSet<>();                                                                                                    //2
+                for (Vertice u : subGrafoCompleto.obtenerVertices()) {                                                                   //2n +1 
+                    for (Arista a : subGrafoCompleto.obtenerAdyacentes(u)) {                                                         //2n +1
+                        String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();                                               //7n*n
+                        String id2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();                                               //7n*n
+                        if (vistas.contains(id1) || vistas.contains(id2)) {                                                                      //2n*n
                             continue;
                         }
-                        vistas.add(id1);
+                        vistas.add(id1);                                                                                                              //n*n
 
-                        graph.getNode(a.getDestino().getNombre())
-                                .setAttribute("ui.class", "gris");
-                        Edge e = graph.getEdge(id1);
-                        if (e == null) {
-                            e = graph.getEdge(id2);
+                        graph.getNode(a.getDestino().getNombre())                                                                       //3n*n
+                                .setAttribute("ui.class", "gris");                                                              //n*n
+                        Edge e = graph.getEdge(id1);                                                                         //2n*n
+                        if (e == null) {                                                                                                       //n*n
+                            e = graph.getEdge(id2);                                                                                  //2n*n
                         }
-                        if (e != null) {
-                            e.setAttribute("ui.class", "highlighted");
+                        if (e != null) {                                                                                         //n*n
+                            e.setAttribute("ui.class", "highlighted");                                                   //n*n
                         }
 
-                        Thread.sleep(1200);
+                        Thread.sleep(1200);                                                                          //n*n
                     }
                 }
 
-                StringBuilder sb = new StringBuilder("Caminos mínimos desde " + origenNombre + ":\n");
-                List<Vertice> vs = new ArrayList<>(base.obtenerVertices());
-                vs.sort(Comparator.comparing(Vertice::getNombre));
-                for (Vertice destino : vs) {
-                    if (destino.equals(origen)) {
-                        continue;
+                StringBuilder sb = new StringBuilder("Caminos mínimos desde " + origenNombre + ":\n");                                 //4
+                List<Vertice> vs = new ArrayList<>(base.obtenerVertices());                                                      //3
+                vs.sort(Comparator.comparing(Vertice::getNombre));                                                               //3
+                for (Vertice destino : vs) {                                                                 //2n +1
+                    if (destino.equals(origen)) {                                                    //n
+                        continue;                                 //n
                     }
-                    List<String> pasos = new ArrayList<>();
-                    for (Vertice v = destino; v != null; v = res.previos.get(v)) {
-                        pasos.add(0, v.getNombre() + " (" + (int) Math.round(distAcum.getOrDefault(v, 0.0)) + ")");
+                    List<String> pasos = new ArrayList<>();                                 //2n
+                    for (Vertice v = destino; v != null; v = res.previos.get(v)) {                                 //(4n + 1)*n
+                        pasos.add(0, v.getNombre() + " (" + (int) Math.round(distAcum.getOrDefault(v, 0.0)) + ")");                                 //6n*n
                     }
-                    sb.append("• ").append(String.join(" → ", pasos)).append("\n");
+                    sb.append("• ").append(String.join(" → ", pasos)).append("\n");                                 //4n
                 }
-                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
-                        this, sb.toString(),
-                        "Dijkstra — todas", JOptionPane.INFORMATION_MESSAGE
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(                                 //2
+                        this, sb.toString(),                                 //1
+                        "Dijkstra — todas", JOptionPane.INFORMATION_MESSAGE                                 //1
                 ));
 
             } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt();                                 //2
             }
-        }).start();
+        }).start();                                 //1
     }
 
-    private void pintarRutaBellmanFord(String origenNombre, String destinoNombre) {
-        new Thread(() -> {
-            try {
-                GrafoTDA base = new GrafoChiapas().getGrafo();
-                Vertice origen = findVertice(base, origenNombre);
-                Vertice destino = findVertice(base, destinoNombre);
+    private void pintarRutaBellmanFord(String origenNombre, String destinoNombre) {                                 //                                                        34n"2 + 93n + 276
+        new Thread(() -> {                                                                               //1
+            try {   
+                GrafoTDA base = new GrafoChiapas().getGrafo();                                                   //3n + 157
+                Vertice origen = findVertice(base, origenNombre);                                                   //2
+                Vertice destino = findVertice(base, destinoNombre);                                                   //2
 
-                BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
-                List<Arista> camino = BellmanFord.reconstruirCamino(res, destino);
+                BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);                             // 15n"2  +  15n + 48
+                List<Arista> camino = BellmanFord.reconstruirCamino(res, destino);                  // 11n + 10
 
-                System.setProperty("org.graphstream.ui", "swing");
-                Graph graph = PanelGrafo.crearGrafoChiapas();  
+                System.setProperty("org.graphstream.ui", "swing");                             //1
+                Graph graph = PanelGrafo.crearGrafoChiapas();                               //19n"2    +   18n   + 10
                 graph.setAttribute("ui.stylesheet", """
                 node {
                   fill-color: rgb(134,192,160);
@@ -390,89 +390,89 @@ public class PanelRutaMasCorta extends JPanel {
                   fill-color: red;
                   size: 4px;
                 }
-            """);
+            """);                               //1
 
-                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-                viewer.disableAutoLayout();
-                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);                               //4
+                viewer.disableAutoLayout();                                                                                        //1
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);                                         //3
 
-                SwingUtilities.invokeLater(() -> {
-                    removeCurrentGrafoPanel();
-                    add(panel, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
+                SwingUtilities.invokeLater(() -> {                               //1
+                    removeCurrentGrafoPanel();                               //7
+                    add(panel, BorderLayout.CENTER);                               //2
+                    revalidate();                               //1
+                    repaint();                               //1
                 });
 
-                Vertice anterior = null;
+                Vertice anterior = null;                               //1
 
-                for (Arista ar : camino) {
+                for (Arista ar : camino) {                                         //2n+1
 
-                    Node nodoDestino = graph.getNode(ar.getDestino().getNombre());
-                    nodoDestino.setAttribute("ui.class", "gris");
+                    Node nodoDestino = graph.getNode(ar.getDestino().getNombre());                               //5n
+                    nodoDestino.setAttribute("ui.class", "gris");                               //n
 
-                    String id1 = ar.getOrigen().getNombre() + "-" + ar.getDestino().getNombre();
-                    String id2 = ar.getDestino().getNombre() + "-" + ar.getOrigen().getNombre();
-                    Edge e = graph.getEdge(id1);
-                    if (e == null) {
-                        e = graph.getEdge(id2);
+                    String id1 = ar.getOrigen().getNombre() + "-" + ar.getDestino().getNombre();                               //7n
+                    String id2 = ar.getDestino().getNombre() + "-" + ar.getOrigen().getNombre();                               //7n
+                    Edge e = graph.getEdge(id1);                               //2n
+                    if (e == null) {                               //n
+                        e = graph.getEdge(id2);                               //2n
                     }
-                    if (e == null) {
-                        e = graph.addEdge(id1,
-                                ar.getOrigen().getNombre(),
-                                ar.getDestino().getNombre(),
+                    if (e == null) {                               //n
+                        e = graph.addEdge(id1,                               //2n
+                                ar.getOrigen().getNombre(),                               //2n
+                                ar.getDestino().getNombre(),                               //2n
                                 false);
                     }
 
-                    e.setAttribute("ui.class", "highlighted");
-                    e.setAttribute("ui.label", ar.getDistancia());
+                    e.setAttribute("ui.class", "highlighted");                               //n
+                    e.setAttribute("ui.label", ar.getDistancia());                               //2n
 
-                    Thread.sleep(1200);
+                    Thread.sleep(1200);                               //n
 
-                    if (anterior != null) {
-                        graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+                    if (anterior != null) {                               //n
+                        graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");                               //3n
                     }
-                    anterior = ar.getDestino();
+                    anterior = ar.getDestino();                                     //2n
                 }
 
-                if (anterior != null) {
-                    graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");
+                if (anterior != null) {                               //1
+                    graph.getNode(anterior.getNombre()).setAttribute("ui.class", "negro");                               //4
                 }
 
-                List<Vertice> secuencia = new ArrayList<>();
-                for (Vertice v = destino; v != null; v = res.previos.get(v)) {
-                    secuencia.add(0, v);
+                List<Vertice> secuencia = new ArrayList<>();                               //2
+                for (Vertice v = destino; v != null; v = res.previos.get(v)) {                               //3n+1
+                    secuencia.add(0, v);                                                   //n
                 }
-                String texto = secuencia.stream()
-                        .map(v -> v.getNombre() + " (" + (int) Math.round(res.distancias.get(v)) + ")")
-                        .collect(Collectors.joining(" → "));
+                String texto = secuencia.stream()                                       //2
+                        .map(v -> v.getNombre() + " (" + (int) Math.round(res.distancias.get(v)) + ")")                               //8
+                        .collect(Collectors.joining(" → "));                               //2
 
-                SwingUtilities.invokeLater(()
-                        -> JOptionPane.showMessageDialog(this,
-                                "Ruta " + origenNombre + " → " + destinoNombre + ":\n"
-                                + texto,
+                SwingUtilities.invokeLater(()                               //1
+                        -> JOptionPane.showMessageDialog(this,                               //1
+                                "Ruta " + origenNombre + " → " + destinoNombre + ":\n"                               //2
+                                + texto,                               //1
                                 "Bellman–Ford",
-                                JOptionPane.INFORMATION_MESSAGE)
+                                JOptionPane.INFORMATION_MESSAGE)                               //1
                 );
 
             } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt();                               //2
             }
-        }).start();
+        }).start();                               //1
     }
 
-    private void pintarRutaBellmanFordTodas(String origenNombre) {
-        new Thread(() -> {
+    private void pintarRutaBellmanFordTodas(String origenNombre) {  //                                                                                                        80n"2 + 124n + 311
+        new Thread(() -> {                               //1
             try {
-                GrafoTDA base = new GrafoChiapas().getGrafo();
-                Vertice origen = findVertice(base, origenNombre);
+                GrafoTDA base = new GrafoChiapas().getGrafo();                               //3n + 157
+                Vertice origen = findVertice(base, origenNombre);                           //9
 
-                BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);
+                BellmanFord.Resultado res = BellmanFord.ejecutar(base, origen);                             // 15n"2  +  15n + 41
 
-                GrafoTDA subGrafoCompleto = BellmanFord.caminoMasCortoTodas(base, origen);
-                Map<Vertice, Double> distAcum = res.distancias;
+                GrafoTDA subGrafoCompleto = BellmanFord.caminoMasCortoTodas(base, origen);          // 15n"2 + 30n + 49
+                Map<Vertice, Double> distAcum = res.distancias;                                       //2                 
 
-                System.setProperty("org.graphstream.ui", "swing");
-                Graph graph = PanelGrafo.crearGrafoChiapas();  
+                System.setProperty("org.graphstream.ui", "swing");                               //1
+                Graph graph = PanelGrafo.crearGrafoChiapas();                                          //19n"2    +   18n   + 10
 
                 graph.setAttribute("ui.stylesheet", """
                 node {
@@ -491,103 +491,103 @@ public class PanelRutaMasCorta extends JPanel {
                   fill-color: red;
                   size: 4px;
                 }
-            """);
+            """);                                          //1
 
-                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-                viewer.disableAutoLayout();
-                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);
+                SwingViewer viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);                                          //4
+                viewer.disableAutoLayout();                                          //1
+                ViewPanel panel = (ViewPanel) viewer.addDefaultView(false);                                          //2
 
-                SwingUtilities.invokeLater(() -> {
-                    removeCurrentGrafoPanel();
-                    add(panel, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
+                SwingUtilities.invokeLater(() -> {                                          //1
+                    removeCurrentGrafoPanel();                                          //1
+                    add(panel, BorderLayout.CENTER);                                          //2
+                    revalidate();                                                          //1
+                    repaint();                                                       //1
                 });
 
-                Set<String> aristasVistas = new HashSet<>();
-                List<Arista> todasAristas = new ArrayList<>();
-                for (Vertice v : subGrafoCompleto.obtenerVertices()) {
-                    for (Arista a : subGrafoCompleto.obtenerAdyacentes(v)) {
-                        String clave1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
-                        String clave2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
-                        if (!aristasVistas.contains(clave1) && !aristasVistas.contains(clave2)) {
-                            aristasVistas.add(clave1);
-                            todasAristas.add(a);
+                Set<String> aristasVistas = new HashSet<>();                                          //2
+                List<Arista> todasAristas = new ArrayList<>();                                          //2
+                for (Vertice v : subGrafoCompleto.obtenerVertices()) {                                          //2n+1
+                    for (Arista a : subGrafoCompleto.obtenerAdyacentes(v)) {                                          //(2n+1)*n
+                        String clave1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();                                          //7n*n
+                        String clave2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();                                          //7n*n
+                        if (!aristasVistas.contains(clave1) && !aristasVistas.contains(clave2)) {                                          //3n*n
+                            aristasVistas.add(clave1);                                          //n*n
+                            todasAristas.add(a);                                          //n*n
                         }
                     }
                 }
 
-                Set<Vertice> visitados = new HashSet<>();
+                Set<Vertice> visitados = new HashSet<>();                                          //2
 
-                for (Arista a : todasAristas) {
+                for (Arista a : todasAristas) {                                          //2n + 1
                    
-                    if (!visitados.contains(a.getOrigen())) {
-                        graph.getNode(a.getOrigen().getNombre()).setAttribute("ui.class", "gris");
-                        visitados.add(a.getOrigen());
+                    if (!visitados.contains(a.getOrigen())) {                                          //2n
+                        graph.getNode(a.getOrigen().getNombre()).setAttribute("ui.class", "gris");                                          //4n
+                        visitados.add(a.getOrigen());                                          //2n
                     }
-                    if (!visitados.contains(a.getDestino())) {
-                        graph.getNode(a.getDestino().getNombre()).setAttribute("ui.class", "gris");
-                        visitados.add(a.getDestino());
+                    if (!visitados.contains(a.getDestino())) {                                          //2n
+                        graph.getNode(a.getDestino().getNombre()).setAttribute("ui.class", "gris");                                          //4n
+                        visitados.add(a.getDestino());                                          //2n
                     }
 
                  
-                    String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();
-                    String id2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();
-                    Edge e = graph.getEdge(id1);
-                    if (e == null) {
-                        e = graph.getEdge(id2);
+                    String id1 = a.getOrigen().getNombre() + "-" + a.getDestino().getNombre();                                          //7n
+                    String id2 = a.getDestino().getNombre() + "-" + a.getOrigen().getNombre();                                          //7n
+                    Edge e = graph.getEdge(id1);                                                                                      //2n
+                    if (e == null) {                                                                                                              //n
+                        e = graph.getEdge(id2);                                                                                                   //2n
                     }
-                    if (e == null) {
-                        e = graph.addEdge(id1,
-                                a.getOrigen().getNombre(),
-                                a.getDestino().getNombre(),
+                    if (e == null) {                                                                                                          //n
+                        e = graph.addEdge(id1,                                                                                    //2n
+                                a.getOrigen().getNombre(),                                          //2n
+                                a.getDestino().getNombre(),                                          //2n
                                 false);
                     }
 
-                    e.setAttribute("ui.class", "highlighted");
-                    e.setAttribute("ui.label", a.getDistancia());
+                    e.setAttribute("ui.class", "highlighted");                                          //n
+                    e.setAttribute("ui.label", a.getDistancia());                                          //n
 
-                    Thread.sleep(1200);
+                    Thread.sleep(1200);                                          //n
                 }
 
-                for (Vertice v : visitados) {
-                    graph.getNode(v.getNombre()).setAttribute("ui.class", "negro");
+                for (Vertice v : visitados) {                                          //2n +1
+                    graph.getNode(v.getNombre()).setAttribute("ui.class", "negro");                                          //3n
                 }
 
                 
-                StringBuilder sb = new StringBuilder("Caminos mínimos desde " + origenNombre + ":\n");
-                List<Vertice> vs = new ArrayList<>(base.obtenerVertices());
-                vs.sort(Comparator.comparing(Vertice::getNombre));
+                StringBuilder sb = new StringBuilder("Caminos mínimos desde " + origenNombre + ":\n");                                          //2
+                List<Vertice> vs = new ArrayList<>(base.obtenerVertices());                                          //3
+                vs.sort(Comparator.comparing(Vertice::getNombre));                                          //4
 
-                for (Vertice destino : vs) {
-                    if (destino.equals(origen)) {
-                        continue;
+                for (Vertice destino : vs) {                                          //2n+1
+                    if (destino.equals(origen)) {                                          //n
+                        continue;                                          //n
                     }
-                    List<String> pasos = new ArrayList<>();
-                    Vertice v = destino;
-                    while (v != null) {
-                        pasos.add(0, v.getNombre() + " (" + (int) Math.round(distAcum.get(v)) + ")");
-                        v = res.previos.get(v);
+                    List<String> pasos = new ArrayList<>();                                          //2n+1
+                    Vertice v = destino;                                          //n
+                    while (v != null) {                                          //(n+1)*n
+                        pasos.add(0, v.getNombre() + " (" + (int) Math.round(distAcum.get(v)) + ")");                                          //6n*n
+                        v = res.previos.get(v);                                          //3n*n
                     }
-                    sb.append("• ").append(String.join(" → ", pasos)).append("\n");
+                    sb.append("• ").append(String.join(" → ", pasos)).append("\n");                                          //4n
                 }
 
-                SwingUtilities.invokeLater(()
-                        -> JOptionPane.showMessageDialog(this,
-                                sb.toString(),
+                SwingUtilities.invokeLater(()                                          //1
+                        -> JOptionPane.showMessageDialog(this,                                          //1
+                                sb.toString(),                                          //1
                                 "Bellman–Ford — todas",
-                                JOptionPane.INFORMATION_MESSAGE)
+                                JOptionPane.INFORMATION_MESSAGE)                                          //1
                 );
 
             } catch (Exception ex) {
-                SwingUtilities.invokeLater(()
-                        -> JOptionPane.showMessageDialog(this,
-                                ex.getMessage(),
+                SwingUtilities.invokeLater(()                                          //1
+                        -> JOptionPane.showMessageDialog(this,                                          //1
+                                ex.getMessage(),                                          //1
                                 "Error",
-                                JOptionPane.ERROR_MESSAGE)
+                                JOptionPane.ERROR_MESSAGE)                                          //1
                 );
             }
-        }).start();
+        }).start();                                          //1
     }
 
 }
