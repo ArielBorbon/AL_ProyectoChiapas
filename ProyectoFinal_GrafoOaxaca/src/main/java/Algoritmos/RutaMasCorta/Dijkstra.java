@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public final class Dijkstra {                                                               //T(n) = 76n"2 + 112n + 97                 O(n"2)
+public final class Dijkstra {                                                               //T(n) = 76n"2 + 115n + 115                O(n"2)
 
     private Dijkstra() {
     }
@@ -26,7 +26,7 @@ public final class Dijkstra {                                                   
      * @throws java.lang.InterruptedException
      */
     public static Map<Vertice, List<Arista>> caminoMasCorto(
-            GrafoTDA grafo, Vertice origen, Vertice destino) throws InterruptedException {
+            GrafoTDA grafo, Vertice origen, Vertice destino) throws InterruptedException {                  // 15n"2  + 30n  +  21
 
         Map<Vertice, Double> distancias = new HashMap<>();              //2
         Map<Vertice, Vertice> previos = new HashMap<>();                     //2         
@@ -76,7 +76,7 @@ public final class Dijkstra {                                                   
         return subGrafo;              //1
     }
 
-    public static ResultadoPrevia ejecutarPrevia(GrafoTDA grafo, Vertice origen) {
+    public static ResultadoPrevia ejecutarPrevia(GrafoTDA grafo, Vertice origen) {                          //  15n"2  + 12n  + 18
         Map<Vertice, Double> dist = new HashMap<>();              //2
         Map<Vertice, Vertice> prev = new HashMap<>();              //2
         PriorityQueue<DistanciaNodo> pq
@@ -114,9 +114,10 @@ public final class Dijkstra {                                                   
      * @param origen
      * @param destino
      * @return
+     * @throws java.lang.InterruptedException
      */
     public static List<Arista> caminoMasCortoListaAristas(
-            GrafoTDA grafo, Vertice origen, Vertice destino) throws InterruptedException {
+            GrafoTDA grafo, Vertice origen, Vertice destino) throws InterruptedException {          //        16n"2  +  24n + 16
 
         Map<Vertice, Double> distancias = new HashMap<>();              //2
         Map<Vertice, Vertice> previos = new HashMap<>();              //2
@@ -168,7 +169,7 @@ public final class Dijkstra {                                                   
      * @return subGrafo con los VÉRTICES de grafo y las aristas de los caminos
      * @throws InterruptedException opcional si quieres animar dentro
      */
-    public static GrafoTDA caminoMasCortoTodas(GrafoTDA grafo, Vertice origen)
+    public static GrafoTDA caminoMasCortoTodas(GrafoTDA grafo, Vertice origen)                  // 15n"2 + 31n + 33
             throws InterruptedException {
 
         Map<Vertice, Double> dist = new HashMap<>();              //2
@@ -243,8 +244,11 @@ public final class Dijkstra {                                                   
      * Devuelve una representación textual del camino más corto desde el origen
      * hasta el destino, usando el mapa de previos generado por Dijkstra o
      * Bellman–Ford.
+     * @param previos
+     * @param destino
+     * @return 
      */
-    public static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {
+    public static String caminoMasTexto(Map<Vertice, Vertice> previos, Vertice destino) {      //     5n + 10
         List<String> nombres = new ArrayList<>();              //2
         Vertice paso = destino;              //1
 
@@ -270,7 +274,7 @@ public final class Dijkstra {                                                   
      * @return mapa de predecesores (cada vértice apunta a su anterior en el
      * camino más corto)
      */
-    public static Map<Vertice, Vertice> caminoMasCortoPrevia(GrafoTDA grafo, Vertice origen) {
+    public static Map<Vertice, Vertice> caminoMasCortoPrevia(GrafoTDA grafo, Vertice origen) {              // 15n"2 + 13n + 13 
         Map<Vertice, Double> distancias = new HashMap<>();              //2
         Map<Vertice, Vertice> previos = new HashMap<>();              //2
         PriorityQueue<DistanciaNodo> cola
