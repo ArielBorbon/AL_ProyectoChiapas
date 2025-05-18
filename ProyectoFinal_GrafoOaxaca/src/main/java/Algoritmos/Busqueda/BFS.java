@@ -21,7 +21,7 @@ import Implementacion.Vertice;
  * resultante (sub‑grafo de aristas “tree edges”). 3. Conocer el nivel
  * (distancia en número de aristas) de cada vértice.
  */
-public final class BFS {
+public final class BFS {                                                                                // T(n) = 140n"2 + 108n + 108           O(n"2)
 
     private static BFSListener listener;
 
@@ -32,7 +32,7 @@ public final class BFS {
      * Registrar un listener para notificación de nuevas aristas durante el recorrido.
      */
     public static void setListener(BFSListener l) {
-        listener = l;
+        listener = l;               //1
     }
 
     /**
@@ -43,16 +43,16 @@ public final class BFS {
      */
     public static class Resultado {
 
-        public final List<Vertice> orden;
+        public final List<Vertice> orden;           
         public final Map<Vertice, List<Arista>> arbol;
         public final Map<Vertice, Integer> nivel;
 
         private Resultado(List<Vertice> orden,
                 Map<Vertice, List<Arista>> arbol,
                 Map<Vertice, Integer> nivel) {
-            this.orden = orden;
-            this.arbol = arbol;
-            this.nivel = nivel;
+            this.orden = orden;                    //1
+            this.arbol = arbol;                     //1
+            this.nivel = nivel;                     //1
         }
     }
 
@@ -64,65 +64,65 @@ public final class BFS {
      * @return Un objeto Resultado con la secuencia de visita, árbol BFS y
      * niveles.
      */
-    public static Resultado ejecutarBFS(GrafoTDA grafo, Vertice semillaInicial) {
-        Map<Vertice, ColorVertice> color = new HashMap<>();
-        Map<Vertice, Integer> nivel = new HashMap<>();
-        Map<Vertice, List<Arista>> arbol = new HashMap<>();
-        List<Vertice> orden = new ArrayList<>();
+    public static Resultado ejecutarBFS(GrafoTDA grafo, Vertice semillaInicial) {                                                       //28n"2 + 20n + 20
+        Map<Vertice, ColorVertice> color = new HashMap<>();                     //2
+        Map<Vertice, Integer> nivel = new HashMap<>();                     //2
+        Map<Vertice, List<Arista>> arbol = new HashMap<>();                     //2
+        List<Vertice> orden = new ArrayList<>();                     //2
 
-        for (Vertice v : grafo.obtenerVertices()) {
-            color.put(v, ColorVertice.BLANCO);
-            nivel.put(v, Integer.MAX_VALUE);
-            arbol.put(v, new ArrayList<>());
+        for (Vertice v : grafo.obtenerVertices()) {                     //2n + 2
+            color.put(v, ColorVertice.BLANCO);                     //2*n
+            nivel.put(v, Integer.MAX_VALUE);                     //2*n
+            arbol.put(v, new ArrayList<>());                     //2*n
         }
 
         // Método auxiliar que arranca un BFS **con su propia cola**
         BiConsumer<Vertice, Boolean> bfsDesde = (semilla, primeraVez) -> {
-            Queue<Vertice> cola = new LinkedList<>();
-            color.put(semilla, ColorVertice.GRIS);
-            nivel.put(semilla, 0);
-            cola.add(semilla);
-            orden.add(semilla);
+            Queue<Vertice> cola = new LinkedList<>();                        //2
+            color.put(semilla, ColorVertice.GRIS);                     //2
+            nivel.put(semilla, 0);                     //1
+            cola.add(semilla);                     //1
+            orden.add(semilla);                     //1
 
-            while (!cola.isEmpty()) {
-                Vertice u = cola.poll();
-                for (Arista a : grafo.obtenerAdyacentes(u)) {
-                    Vertice v = a.getDestino();
-                    if (color.get(v) == ColorVertice.BLANCO) {
-                        color.put(v, ColorVertice.GRIS);
-                        nivel.put(v, nivel.get(u) + 1);
-                        cola.add(v);
-                        orden.add(v);
+            while (!cola.isEmpty()) {                     //n+1
+                Vertice u = cola.poll();                             //2*n
+                for (Arista a : grafo.obtenerAdyacentes(u)) {                     //(2n + 1)  * n
+                    Vertice v = a.getDestino();                                           //2*n*n
+                    if (color.get(v) == ColorVertice.BLANCO) {                       //3*n*n
+                        color.put(v, ColorVertice.GRIS);                                 //2*n*n
+                        nivel.put(v, nivel.get(u) + 1);                                  //3*n*n
+                        cola.add(v);                                                    //1*n*n
+                        orden.add(v);                                                            //1*n*n
 
-                        Arista nueva = new Arista(u, v, a.getDistancia());
-                        arbol.get(u).add(nueva);
-                        arbol.get(v).add(new Arista(v, u, a.getDistancia()));
+                        Arista nueva = new Arista(u, v, a.getDistancia());                       //3*n*n
+                        arbol.get(u).add(nueva);                                                     //2*n*n
+                        arbol.get(v).add(new Arista(v, u, a.getDistancia()));                            //4*n*n
 
                         // Notificar al listener y pausar para animación
-                        if (listener != null) {
-                            listener.onNuevaArista(nueva);
+                        if (listener != null) {                                  //1*n*n
+                            listener.onNuevaArista(nueva);                                       //1*n*n
                             try {
-                                Thread.sleep(500);
+                                Thread.sleep(500);                                           //1*n*n
                             } catch (InterruptedException ie) {
-                                Thread.currentThread().interrupt();
+                                Thread.currentThread().interrupt();                                          //2*n*n
                             }
                         }
                     }
                 }
-                color.put(u, ColorVertice.NEGRO);
+                color.put(u, ColorVertice.NEGRO);                                                //2*n
             }
         };
 
-        bfsDesde.accept(semillaInicial, true);
+        bfsDesde.accept(semillaInicial, true);                               //1
 
         // 2) Si hay vértices aún blancos, arrancarles su propio BFS
-        for (Vertice v : grafo.obtenerVertices()) {
-            if (color.get(v) == ColorVertice.BLANCO) {
-                bfsDesde.accept(v, false);
+        for (Vertice v : grafo.obtenerVertices()) {                                      //2n + 1
+            if (color.get(v) == ColorVertice.BLANCO) {                                   //3 * n
+                bfsDesde.accept(v, false);                                   //1*n
             }
         }
 
-        return new Resultado(orden, arbol, nivel);
+        return new Resultado(orden, arbol, nivel);                                   //1
     }
 
     /**
@@ -134,7 +134,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static List<Vertice> recorrido(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        return ejecutarBFS(grafo, semilla).orden;
+        return ejecutarBFS(grafo, semilla).orden;               //28n"2 + 20n + 20                       
     }
 
     /**
@@ -146,7 +146,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static Map<Vertice, List<Arista>> obtenerArbol(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        return ejecutarBFS(grafo, semilla).arbol;
+        return ejecutarBFS(grafo, semilla).arbol;   //28n"2 + 20n + 20
     }
 
     /**
@@ -159,7 +159,7 @@ public final class BFS {
      * @throws java.lang.InterruptedException
      */
     public static Map<Vertice, Integer> obtenerNiveles(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        return ejecutarBFS(grafo, semilla).nivel;
+        return ejecutarBFS(grafo, semilla).nivel;           //28n"2 + 20n + 20
     }
 
     /**
@@ -171,13 +171,13 @@ public final class BFS {
      * @return
      * @throws java.lang.InterruptedException
      */
-    public static Map<Integer, List<Vertice>> agruparPorNivel(GrafoTDA grafo, Vertice semilla) throws InterruptedException {
-        Resultado res = ejecutarBFS(grafo, semilla);
-        Map<Integer, List<Vertice>> grupos = new LinkedHashMap<>();
-        for (Vertice v : res.orden) {
-            int nl = res.nivel.get(v);
-            grupos.computeIfAbsent(nl, k -> new ArrayList<>()).add(v);
+    public static Map<Integer, List<Vertice>> agruparPorNivel(GrafoTDA grafo, Vertice semilla) throws InterruptedException {                //28n"2    + 28n + 24
+        Resultado res = ejecutarBFS(grafo, semilla);                //28n"2 + 20n + 20
+        Map<Integer, List<Vertice>> grupos = new LinkedHashMap<>();                     //2
+        for (Vertice v : res.orden) {                                    //2n + 1
+            int nl = res.nivel.get(v);                                                       //(3)*n
+            grupos.computeIfAbsent(nl, k -> new ArrayList<>()).add(v);                  //(3)*n
         }
-        return grupos;
+        return grupos;                  //1
     }
 }
