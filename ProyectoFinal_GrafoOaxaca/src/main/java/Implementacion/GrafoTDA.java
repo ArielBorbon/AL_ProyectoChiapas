@@ -12,9 +12,6 @@ import java.util.Set;
  * vértices, agregar aristas, obtener adyacencias y calcular el Árbol de
  * Expansión Mínima (MST) utilizando el algoritmo de Kruskal.
  *
- * @author Garcia Acosta Alicia Denise 00000252402
- * @author Luna Esquer Pedro 00000252687
- * @author Preciado Guerrero Mario Alejandro 00000252940
  */
 public class GrafoTDA {                                                             //T(N) = 5n + 46        O(N)
 

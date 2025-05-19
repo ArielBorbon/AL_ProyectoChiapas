@@ -7,7 +7,7 @@ import GUI.MenuPrincipal;
  *
  * @author Luna Esquer Pedro 00000252687
  * @author Ariel Eduardo Borbon Izaguirre 00000252116
- * @author 
+ * @author Isaias Coronado
  */
 public class Main {
 
