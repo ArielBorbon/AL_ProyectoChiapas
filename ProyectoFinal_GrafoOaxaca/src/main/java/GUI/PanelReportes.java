@@ -335,25 +335,34 @@ public class PanelReportes extends JPanel {
                                      
                                      Metodo rutaMasCorta: 
                                      Este metodo obtiene la lista de vertice y aristas  para llegar de un vertice a otro de la manera mas corta posible
-                                     T(n) = 44n"2 + 112n + 97                 O(n"2)   /   O((V + E) log V)
+                                     T(n) = 15n"2  + 30n  +  21                 O(n"2)   /   O((V + E) log V)
                                      
                                      Metodo caminoMasCortoTodas:
                                      Este metodo obtiene todos los caminos mas cortos hacia una arista, donde como parametros tiene el grafo y la arista origen
                                      y retorna un grafo con los caminos mas cortos
-                                     T(n) = 55n"2 + 121n + 97                 O(n"2)   /   O((V + E) log V)
+                                     T(n) = 15n"2 + 31n + 33                 O(n"2)   /   O((V + E) log V)
                                      
+                                     Metodo EjecutarPrevia
+                                     Este metodo retorna un objeto resultadoPrevia (descripcion abajo) se usa para conocer esta mediante un Grafo y un vertice origen
+                                     T(n) =  15n"2  + 30n  +  21            O(n"2)   /   O((V + E) log V)
                                      
                                      Clase DistanciaNodo:
                                      esta clase tiene 2 atributos, un vertice nodo y la distancia hacia este (lo usa el dijkstra para la mayoria de retornos y saber la distancia)
                                      T(n) = 4              O(1)   (t(n) de la clase)
                                      
+                                     Metodo CaminoMasCortoListaAristas:
+                                     Este metodo retorna un subgrafo  con los vertices del grafo y las aristas de estos caminos
+                                     T(n) = 16n´2 + 31n + 33   O(n´2    )
+                                     
                                      
                                      Metodo CaminoMasTexto:
                                      Este metodo retorna en un String el camino mas corto, con un formato de vertice -> vertice (peso) -> Vertice (Sumatoria final)
-                                     T(n) = 5n + 1        O(n)     
+                                     T(n) = 5n + 10        O(n)  
+                                     
+                                     
                                      
                                      Metodo CaminoMasCortoPrevia: Este verifica todas las distancias mas cortas previas, usado como complemento para el metodo principal
-                                     T(n) = 14n´2 + 10n + 8           O(n´2)
+                                     T(n) =  15n"2 + 13n + 13            O(n´2)
                                      
                                      Clase resultadoPrevia:
                                      Esta clase tiene una lista con todas las distancias hacia este vertice y los vertices que toca con estas distancias,
@@ -362,7 +371,7 @@ public class PanelReportes extends JPanel {
                                      
                                      
                                      ---------- T(n) Total de la clase: --------
-                                     T(n) = 76n"2 + 112n + 97                 O(n´2)        /      O((V + E) log V)
+                                     T(n) = 76n"2 + 115n + 115                O(n´2)        /      O((V + E) log V)
                                      
                                      
                                      
@@ -370,7 +379,35 @@ public class PanelReportes extends JPanel {
         });
 
         btnBellman.addActionListener(e -> {
-            textAreaReportes.setText("\n--- Reporte Bellman-Ford ---\n\nRutas con pesos negativos permitidos.\nComplejidad: O(V * E)");
+            textAreaReportes.setText("""
+                                     
+                                     --- Reporte Bellman-Ford ---
+                                     Rutas con pesos negativos permitidos.
+                                     Complejidad: O(V * E)
+                                     
+                                     
+                                     Metodo Ejecutar:
+                                     Este metodo ejecuta el algoritmo BellmanFord sobre un grafo y retorna un objeto clase Resultado (descripcion abajo)
+                                     T(n) = 15n´2  +  15n + 41      O(n´2)       /        O(V * E)
+                                     
+                                     Metodo reconstruirCamino: 
+                                     Este metodo nos muestra la lista de aristas necesarias para reconstruir del camino del vertice seleccionado al vertice destino
+                                     T(n) = 11n + 9     O(n)
+                                     
+                                     Metodo CaminoMasTexto:
+                                     Este metodo nos retorna un String con el nombre del vertice del camino mas corto (Nombre (peso) -> Nombre2 (peso2) -> )
+                                     T(n) = 4n + 9      O(n)
+                                     
+                                     
+                                     Metodo CaminoMasCortoTodas:
+                                     Este metodo retorna un subgrafo de todos los vertices y las aristas con sus caminos mas cortos 
+                                     T(n) = 15n´2 + 30n + 47        O(n´2)      /        O(V * E)
+                                     
+                                     
+                                     
+                                     ---------- T(n) Total de la clase: --------
+                                     T(n) = 30n"2 + 60 +  112                              O(n"2)      /    O(V * E)
+                                     """);
         });
     }
 }
