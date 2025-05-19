@@ -226,9 +226,31 @@ public class PanelReportes extends JPanel {
                                      Este algoritmo recorre el grafo en profundidad utilizando recursión o una pila.
                                      Complejidad: O(V + E)
                                      
+                                     Método ejecutarDFS:
+                                     Este método es el núcleo del algoritmo DFS. Inicializa las estructuras de datos (colores de vértices, lista de orden de descubrimiento y árbol DFS)
+                                     y luego llama a una función de visita recursiva (dfsVisit) comenzando desde el vértice semilla.
+                                     También maneja componentes desconectados iterando sobre todos los vértices para asegurar que todos sean visitados.
+                                     T(n) = O(V+E) (donde V es el número de vértices y E el número de aristas)
                                      
+                                     Método recorridoOrden:
+                                     Este método es una utilidad que llama a ejecutarDFS y retorna únicamente la lista de vértices en el orden en que fueron descubiertos.
+                                     T(n) = O(V+E) (dominado por la llamada a ejecutarDFS)
                                      
+                                     Método obtenerArbol:
+                                     Similar a recorridoOrden, este método llama a ejecutarDFS pero retorna el árbol DFS construido durante el recorrido (representado como un mapa de adyacencia).
+                                     T(n) = O(V+E) (dominado por la llamada a ejecutarDFS)
                                      
+                                     Clase Interna Resultado:
+                                     Esta clase simple se utiliza para empaquetar el orden de descubrimiento y el árbol DFS. Su constructor tiene una complejidad constante.
+                                     T(n) = 2, O(1)
+                                     
+                                     Método setListener:
+                                     Permite registrar un listener para observar el progreso del algoritmo (por ejemplo, para animaciones). Es una operación de asignación simple.
+                                     T(n) = 1, O(1)
+                                     
+                                     --------- T(n) Total de la Clase (considerando el método principal ejecutarDFS) ---------
+                                     T(n) = O(V+E)
+                                     (La complejidad de la clase está dominada por la ejecución del algoritmo DFS principal.)
                                      """);
         });
 
