@@ -100,7 +100,7 @@ public class Boruvka extends Thread {
                     }
                 }
 
-                // ✅ Notificar al listener y pausar después de cada iteración
+                // Notificar al listener y pausar después de cada iteración
                 if (listener != null) {
                     listener.onActualizaMST(mst);
                     Thread.sleep(1000);
