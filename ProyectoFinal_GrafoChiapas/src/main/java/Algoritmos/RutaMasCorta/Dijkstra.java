@@ -133,7 +133,6 @@ public final class Dijkstra {
         while (!cola.isEmpty()) {
             DistanciaNodo dn = cola.poll();
             Vertice u = dn.getNodo();
-            double du = dn.getDistancia();
 
             for (Arista a : grafo.obtenerAdyacentes(u)) {
                 Vertice v = a.getDestino();

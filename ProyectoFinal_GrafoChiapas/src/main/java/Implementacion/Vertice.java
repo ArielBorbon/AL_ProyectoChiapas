@@ -1,7 +1,5 @@
 package Implementacion;
 
-import java.util.Objects;
-
 public class Vertice {                                      //  T(N) 34   O(1)
 
     private String nombre;

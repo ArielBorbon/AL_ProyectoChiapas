@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 public class MenuPrincipal extends JFrame {                                      //         T(n) = 214          O(1)
 
     private JPanel panelMenuLateral;
-    private PanelDefault panelDefault;
 
     public MenuPrincipal() {                                                //213
         this.setTitle("ALGORITMOS DE GRAFOS EN CHIAPAS");       //1
@@ -49,7 +48,7 @@ public class MenuPrincipal extends JFrame {                                     
         // Agregar el panel al JFrame
         this.add(panelMenuLateral, BorderLayout.WEST);                      //2
         this.setVisible(true);                                                         //1
-        this.add(this.panelDefault = new PanelDefault(), BorderLayout.CENTER);  //4
+        this.add(new PanelDefault(), BorderLayout.CENTER);  //4
         // Agregar acciones a los botones manualmente sin condicionales
         btnVisualizar.addActionListener(e -> {                                           //1
             this.getContentPane().removeAll();                                           //2
