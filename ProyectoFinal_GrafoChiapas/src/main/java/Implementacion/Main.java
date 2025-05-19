@@ -5,9 +5,9 @@ import GUI.MenuPrincipal;
 /**
  * Clase principal para inicializar el grafo y desplegar el menú.
  *
- * @author Luna Esquer Pedro 00000252687
+ * @author Pedro Luna Esquer 00000252687
  * @author Ariel Eduardo Borbon Izaguirre 00000252116
- * @author Isaias Coronado
+ * @author Isaias Coronado Molina 00000252252
  */
 public class Main {
 
