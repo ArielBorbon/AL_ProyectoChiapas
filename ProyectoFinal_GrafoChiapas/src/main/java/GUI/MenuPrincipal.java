@@ -49,6 +49,8 @@ public class MenuPrincipal extends JFrame {                                     
         this.add(panelMenuLateral, BorderLayout.WEST);                      //2
         this.setVisible(true);                                                         //1
         this.add(new PanelDefault(), BorderLayout.CENTER);  //4
+        this.revalidate();
+        this.repaint();
         // Agregar acciones a los botones manualmente sin condicionales
         btnVisualizar.addActionListener(e -> {                                           //1
             this.getContentPane().removeAll();                                           //2
